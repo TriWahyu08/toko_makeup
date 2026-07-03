@@ -13,7 +13,7 @@ import uuid
 import json
 import os
 import requests
-from google import genai
+import google.generativeai as genai
 import re
 from .models import Pesanan, PesananItem, Produk, Notification  
 from decimal import Decimal
