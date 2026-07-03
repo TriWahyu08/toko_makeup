@@ -165,3 +165,8 @@ BASE_URL = 'http://127.0.0.1:8000'
 
 # ===== GEMINI API =====
 GEMINI_API_KEY = 'AQ.Ab8RN6Kwp-jQdM_1g3FVoEQRvF6JfEosjil2xkAJ4fn5OSxqwg'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-4e5c05.up.railway.app',
+    'http://web-production-4e5c05.up.railway.app',
+]
