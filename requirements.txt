@@ -1,0 +1,11 @@
+Django==6.0.6
+django-humanize
+requests
+google-generativeai
+pillow
+python-decouple
+django-allauth
+gunicorn
+dj-database-url
+psycopg2-binary
+whitenoise
