@@ -1,0 +1,578 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+        
+        /* ===== HEADER ===== */
+        .admin-header { 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b2e 100%);
+            padding: 16px 24px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+        }
+        .admin-header .brand { 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: white; 
+        }
+        .admin-header .brand span { 
+            color: #F72F9A; 
+            background: rgba(247,47,154,0.2);
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+        .admin-header .user-info { display: flex; align-items: center; gap: 12px; color: white; }
+        .admin-header .user-info .avatar { 
+            width: 38px; 
+            height: 38px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #F72F9A, #d6257e);
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 2px 15px rgba(247,47,154,0.3);
+        }
+        .admin-header .badge-admin { 
+            background: rgba(247,47,154,0.2); 
+            color: #F72F9A; 
+            padding: 4px 14px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            font-weight: 600; 
+            border: 1px solid rgba(247,47,154,0.3);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 300; backdrop-filter: blur(4px); }
+        .sidebar-overlay.show { display: block; }
+        .sidebar { 
+            position: fixed; 
+            top: 0; 
+            left: -320px; 
+            width: 320px; 
+            height: 100%; 
+            background: #FFCCEC; 
+            z-index: 301; 
+            transition: left 0.4s cubic-bezier(0.4,0,0.2,1); 
+            padding: 0; 
+            box-shadow: 4px 0 40px rgba(0,0,0,0.2); 
+            border-radius: 0 24px 24px 0; 
+            overflow-y: auto; 
+        }
+        .sidebar.open { left: 0; }
+        .sidebar-header { 
+            background: linear-gradient(135deg, #F72F9A, #d6257e); 
+            padding: 30px 24px 24px; 
+            border-radius: 0 24px 0 0; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .sidebar-header .close-btn { 
+            background: rgba(255,255,255,0.2); 
+            border: none; 
+            font-size: 20px; 
+            color: white; 
+            cursor: pointer; 
+            padding: 8px 14px; 
+            border-radius: 12px; 
+            float: right; 
+            transition: all 0.3s; 
+            backdrop-filter: blur(4px);
+            position: relative;
+            z-index: 5;
+        }
+        .sidebar-header .close-btn:hover { 
+            background: rgba(255,255,255,0.35); 
+            transform: rotate(90deg) scale(1.1);
+        }
+        .sidebar-profile { display: flex; align-items: center; gap: 16px; margin-top: 16px; position: relative; z-index: 2; }
+        .sidebar-profile .profile-avatar { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            border: 3px solid rgba(255,255,255,0.4); 
+            background: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: #F72F9A; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+            flex-shrink: 0; 
+        }
+        .sidebar-profile .profile-text .name { font-weight: 700; font-size: 17px; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .sidebar-profile .profile-text .email { font-size: 12px; color: rgba(255,255,255,0.75); word-break: break-all; }
+        .sidebar-menu { 
+            padding: 16px 16px 6px; /* PADDING BOTTOM DIKURANGI */
+        }
+        .sidebar-menu .menu-label { 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            color: rgba(247,47,154,0.5); 
+            font-weight: 700; 
+            padding: 8px 12px 4px; 
+        }
+        .sidebar-menu .menu-list { list-style: none; padding: 0; margin: 0; }
+        .sidebar-menu .menu-list li { 
+            padding: 12px 16px; 
+            margin: 3px 0; 
+            border-radius: 14px; 
+            font-weight: 500; 
+            color: #4a1a3a; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            transition: all 0.3s; 
+        }
+        .sidebar-menu .menu-list li i { width: 22px; font-size: 16px; color: #F72F9A; transition: all 0.3s; }
+        .sidebar-menu .menu-list li span { flex: 1; font-size: 14px; }
+        .sidebar-menu .menu-list li:hover { background: rgba(247,47,154,0.12); transform: translateX(5px); }
+        .sidebar-menu .menu-list li:hover i { transform: scale(1.1); }
+        .sidebar-menu .menu-list li.active { background: rgba(247,47,154,0.18); border-left: 4px solid #F72F9A; }
+        .sidebar-menu .menu-divider { height: 1px; background: rgba(247,47,154,0.15); margin: 8px 16px; }
+        .sidebar-logout { 
+            padding: 4px 16px 8px; /* PADDING TOP DIKURANGI */
+        }
+        .sidebar-logout .logout-btn { 
+            width: 100%; 
+            padding: 12px; /* PADDING BUTTON DIKURANGI */
+            border: none; 
+            background: rgba(247,47,154,0.12); 
+            color: #F72F9A; 
+            border-radius: 14px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            text-decoration: none; 
+        }
+        .sidebar-logout .logout-btn:hover { background: #F72F9A; color: white; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(247,47,154,0.3); }
+        .sidebar-footer { 
+            padding: 4px 24px 12px; 
+            text-align: center; 
+            font-size: 11px; 
+            color: rgba(247,47,154,0.4); 
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(247,47,154,0.05); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(247,47,154,0.3); border-radius: 10px; }
+
+
+        /* ===== CONTENT ===== */
+        .admin-content { padding: 24px; }
+        
+        .stat-card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 24px 20px; 
+            border: none; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+        .stat-card .stat-value { font-size: 32px; font-weight: 800; color: #1a1a1a; }
+        .stat-card .stat-label { font-size: 13px; color: #888; font-weight: 500; }
+        .stat-card .stat-icon { 
+            font-size: 36px; 
+            opacity: 0.15;
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+            color: #F72F9A;
+        }
+        .stat-card .stat-icon i { font-size: 48px; }
+        
+        .stat-card.pink-gradient { 
+            background: linear-gradient(135deg, #F72F9A, #d6257e);
+            color: white;
+        }
+        .stat-card.pink-gradient .stat-value,
+        .stat-card.pink-gradient .stat-label,
+        .stat-card.pink-gradient .stat-icon { color: white; }
+        .stat-card.pink-gradient .stat-icon { opacity: 0.2; }
+        
+        .stat-card.blue-gradient { 
+            background: linear-gradient(135deg, #4A90D9, #357ABD);
+            color: white;
+        }
+        .stat-card.blue-gradient .stat-value,
+        .stat-card.blue-gradient .stat-label,
+        .stat-card.blue-gradient .stat-icon { color: white; }
+        .stat-card.blue-gradient .stat-icon { opacity: 0.2; }
+        
+        .stat-card.green-gradient { 
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+        }
+        .stat-card.green-gradient .stat-value,
+        .stat-card.green-gradient .stat-label,
+        .stat-card.green-gradient .stat-icon { color: white; }
+        .stat-card.green-gradient .stat-icon { opacity: 0.2; }
+        
+        .stat-card.orange-gradient { 
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+        }
+        .stat-card.orange-gradient .stat-value,
+        .stat-card.orange-gradient .stat-label,
+        .stat-card.orange-gradient .stat-icon { color: white; }
+        .stat-card.orange-gradient .stat-icon { opacity: 0.2; }
+        
+        /* ===== REVENUE CARD - PERBAIKAN RESPONSIVE ===== */
+        .stat-card.revenue-card {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+            padding: 20px 18px;
+        }
+        .stat-card.revenue-card .stat-value,
+        .stat-card.revenue-card .stat-label,
+        .stat-card.revenue-card .stat-icon { color: white; }
+        .stat-card.revenue-card .stat-icon { opacity: 0.2; }
+        .stat-card.revenue-card .stat-value {
+            font-size: 28px;
+            word-break: break-word;
+        }
+        
+        /* Revenue detail inside card - PERBAIKAN RESPONSIVE */
+        .revenue-detail {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            font-size: 11px;
+        }
+        .revenue-detail .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .revenue-detail .detail-item .label {
+            opacity: 0.7;
+        }
+        .revenue-detail .detail-item .value {
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .status-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-badge.menunggu { background: #FFF3E0; color: #F57C00; }
+        .status-badge.dikemas { background: #E3F2FD; color: #1976D2; }
+        .status-badge.dikirim { background: #F3E5F5; color: #7B1FA2; }
+        .status-badge.selesai { background: #E8F5E9; color: #388E3C; }
+        .status-badge.dibatalkan { background: #FFEBEE; color: #D32F2F; }
+        
+        .menu-toggle { background: none; border: none; font-size: 24px; color: white; cursor: pointer; padding: 4px; opacity: 0.8; transition: all 0.3s; }
+        .menu-toggle:hover { opacity: 1; color: #F72F9A; }
+        
+        .section-card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 24px; 
+            border: none; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+        .section-card .section-title { font-weight: 700; font-size: 16px; margin-bottom: 16px; color: #1a1a1a; }
+        .section-card .section-title i { color: #F72F9A; margin-right: 8px; }
+        
+        .btn-pink { 
+            background: linear-gradient(135deg, #F72F9A, #d6257e);
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            padding: 6px 20px; 
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-pink:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 30px rgba(247,47,154,0.3);
+            color: white;
+        }
+        
+        .product-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f8f8f8;
+        }
+        .order-product-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .order-product-name small {
+            font-weight: 400;
+            color: #999;
+            font-size: 11px;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) { 
+            .admin-content { padding: 16px; } 
+            .stat-card .stat-value { font-size: 24px; }
+            .stat-card.revenue-card .stat-value { font-size: 22px; }
+            .revenue-detail { font-size: 10px; gap: 4px 12px; }
+            .revenue-detail .detail-item .value { font-size: 11px; }
+        }
+        
+        @media (max-width: 480px) {
+            .stat-card.revenue-card { padding: 16px 14px; }
+            .stat-card.revenue-card .stat-value { font-size: 18px; }
+            .revenue-detail { 
+                flex-direction: column; 
+                gap: 2px;
+                font-size: 10px;
+            }
+            .revenue-detail .detail-item .value { font-size: 10px; }
+            .stat-card .stat-icon i { font-size: 32px; }
+            .stat-card .stat-icon { right: 8px; bottom: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="close-btn" id="closeSidebar">✕</button>
+            <div class="sidebar-profile">
+                <div class="profile-avatar">{{ user.first_name|default:user.username|slice:":1"|upper }}</div>
+                <div class="profile-text">
+                    <div class="name">{{ user.first_name|default:user.username }}</div>
+                    <div class="email">{{ user.email }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-label">Menu Utama</div>
+            <ul class="menu-list">
+                <li onclick="window.location.href='/'"><i class="fas fa-home"></i><span>Beranda</span></li>
+                <li onclick="window.location.href='{% url "toko:pesanan_saya" %}'"><i class="fas fa-shopping-bag"></i><span>Pesanan Saya</span></li>
+                <li onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i><span>Profil</span></li>
+                <li onclick="window.location.href='{% url "toko:tambah_alamat" %}'"><i class="fas fa-map-pin"></i><span>Alamat Saya</span></li>
+            </ul>
+            <div class="menu-divider"></div>
+            <div class="menu-label">Lainnya</div>
+            <ul class="menu-list">
+                <li onclick="window.location.href='{% url "toko:ai_chat" %}'"><i class="fas fa-headset"></i><span>Hubungi Kami</span></li>
+                <li onclick="window.location.href='{% url "toko:bantuan" %}'"><i class="fas fa-question-circle"></i><span>Bantuan</span></li>
+                <li onclick="window.location.href='{% url "toko:pengaturan" %}'"><i class="fas fa-cog"></i><span>Pengaturan</span></li>
+            </ul>
+            <div class="menu-divider"></div>
+            <div class="menu-label">Admin</div>
+            <ul class="menu-list">
+                <li class="active" onclick="window.location.href='{% url "toko:admin_dashboard" %}'"><i class="fas fa-chart-pie"></i><span>Dashboard Admin</span></li>
+                <li onclick="window.location.href='{% url "toko:admin_orders" %}'"><i class="fas fa-shopping-bag"></i><span>Kelola Pesanan</span></li>
+                <li onclick="window.location.href='{% url "toko:admin_users" %}'"><i class="fas fa-users"></i><span>Kelola User</span></li>
+            </ul>
+        </div>
+        <div class="sidebar-logout">
+            <a href="{% url 'toko:logout' %}" class="logout-btn"><i class="fas fa-sign-out-alt"></i>Log Out</a>
+        </div>
+        <div class="sidebar-footer">MayBelline v1.0 © 2026</div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="admin-header">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div>
+                <button class="menu-toggle" id="openSidebar"><i class="fas fa-bars"></i></button>
+                <span class="brand ms-3">May<span>Belline</span> Admin</span>
+            </div>
+            <div class="user-info">
+                <span class="badge-admin"><i class="fas fa-shield-alt me-1"></i>Admin</span>
+                <span class="d-none d-sm-inline">{{ user.username }}</span>
+                <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== CONTENT ===== -->
+    <div class="admin-content">
+        <!-- Statistik -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card pink-gradient">
+                    <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+                    <div class="stat-value">{{ total_orders }}</div>
+                    <div class="stat-label">Total Pesanan</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card blue-gradient">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-value">{{ total_users }}</div>
+                    <div class="stat-label">Total User</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card revenue-card">
+                    <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="stat-value">Rp{{ total_revenue|floatformat:0|intcomma }}</div>
+                    <div class="stat-label">Total Pendapatan</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card orange-gradient">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-value">{{ status_counts.menunggu|default:0 }}</div>
+                    <div class="stat-label">Menunggu Diproses</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Chart -->
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-chart-pie"></i> Status Pesanan</div>
+                    <div class="d-flex flex-wrap gap-3">
+                        <span class="status-badge menunggu">⏳ Menunggu: {{ status_counts.menunggu|default:0 }}</span>
+                        <span class="status-badge dikemas">📦 Dikemas: {{ status_counts.dikemas|default:0 }}</span>
+                        <span class="status-badge dikirim">🚚 Dikirim: {{ status_counts.dikirim|default:0 }}</span>
+                        <span class="status-badge selesai">✅ Selesai: {{ status_counts.selesai|default:0 }}</span>
+                        <span class="status-badge dibatalkan">❌ Dibatalkan: {{ status_counts.dibatalkan|default:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="row">
+            <div class="col-12">
+                <div class="section-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="section-title mb-0"><i class="fas fa-history"></i> Pesanan Terbaru</div>
+                        <a href="{% url 'toko:admin_orders' %}" class="btn btn-pink btn-sm">Lihat Semua →</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Tanggal</th>
+                                    <th>Produk</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><strong class="text-primary">{{ order.id }}</strong></td>
+                                    <td>{{ order.tanggal_pesan|date:"d M Y H:i"|default:"-" }}</td>
+                                    <td>
+                                        {% with items=order.items.all %}
+                                            {% if items %}
+                                                {% for item in items|slice:":2" %}
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        {% if item.produk.image_link %}
+                                                            <img src="{{ item.produk.image_link }}" alt="{{ item.produk.name }}" class="product-thumb" onerror="this.style.display='none'">
+                                                        {% else %}
+                                                            <div class="product-thumb d-flex align-items-center justify-content-center bg-light text-muted" style="font-size:10px;">
+                                                                <i class="fas fa-image"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div class="order-product-name">
+                                                            {{ item.produk.name|default:"Produk tidak tersedia" }}
+                                                            <small>×{{ item.jumlah }}</small>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                                {% if items|length > 2 %}
+                                                    <small class="text-muted">+{{ items|length|add:"-2" }} produk lainnya</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">Tidak ada produk</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                    <td class="fw-semibold">Rp{{ order.total|floatformat:"0"|intcomma|default:"0" }}</td>
+                                    <td><span class="status-badge {{ order.status|default:'menunggu' }}">{{ order.status|default:'Menunggu'|title }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">Belum ada pesanan</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== SIDEBAR =====
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const openBtn = document.getElementById('openSidebar');
+        const closeBtn = document.getElementById('closeSidebar');
+
+        function openSidebar() { 
+            sidebar.classList.add('open'); 
+            overlay.classList.add('show'); 
+            document.body.style.overflow = 'hidden'; 
+        }
+        function closeSidebar() { 
+            sidebar.classList.remove('open'); 
+            overlay.classList.remove('show'); 
+            document.body.style.overflow = ''; 
+        }
+        
+        openBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // Close with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>

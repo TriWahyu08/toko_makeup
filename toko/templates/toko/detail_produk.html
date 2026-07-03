@@ -1,0 +1,373 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Produk - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #FFF3FB; padding-bottom: 80px; color: #1a1a1a; }
+        
+        .header { background: white; padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(247, 47, 154, 0.08); }
+        .header-top { display: flex; align-items: center; justify-content: space-between; }
+        .header-title { font-size: 18px; font-weight: 700; color: #1a1a1a; flex: 1; text-align: center; }
+        .header-title .brand-highlight { color: #F72F9A; }
+        .header .back-btn { background: none; border: none; font-size: 20px; color: #1a1a1a; cursor: pointer; padding: 4px; }
+        .header .back-btn:hover { color: #F72F9A; }
+        .header .love-btn-header { background: none; border: none; font-size: 20px; color: #FFCCEC; cursor: pointer; padding: 4px; transition: all 0.3s; }
+        .header .love-btn-header.loved { color: #F72F9A; }
+        .header .love-btn-header:hover { transform: scale(1.1); }
+        
+        .product-detail { padding: 16px 20px; }
+        .product-image-main { background: white; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; margin-bottom: 16px; }
+        .product-image-main img { max-height: 300px; width: 100%; object-fit: contain; }
+        
+        .product-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+        .product-brand-name { font-size: 14px; color: #999; margin-bottom: 4px; }
+        .product-rating-detail { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .product-rating-detail .stars { color: #ffb800; font-size: 14px; }
+        .product-rating-detail .review-count { color: #888; font-size: 13px; }
+        .product-price-detail { font-size: 24px; font-weight: 700; color: #F72F9A; margin-bottom: 8px; }
+        
+        .stock-status { display: inline-block; padding: 4px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+        .stock-status.available { background: #E8F5E9; color: #388E3C; }
+        .stock-status.unavailable { background: #FFEBEE; color: #D32F2F; }
+        
+        .product-description { background: white; border-radius: 16px; padding: 16px; border: 1px solid #e8e8e8; margin-bottom: 16px; }
+        .product-description h6 { font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+        .product-description p { font-size: 14px; color: #666; line-height: 1.6; }
+        .product-description .read-more { color: #F72F9A; cursor: pointer; font-weight: 600; }
+        
+        .action-buttons { display: flex; gap: 12px; margin-top: 16px; }
+        .action-buttons .btn-cart { flex: 1; padding: 14px; border: 2px solid #F72F9A; background: white; color: #F72F9A; border-radius: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .action-buttons .btn-cart:hover { background: #FFF3FB; transform: translateY(-2px); }
+        .action-buttons .btn-buy { flex: 1; padding: 14px; border: none; background: #F72F9A; color: white; border-radius: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .action-buttons .btn-buy:hover { background: #d6257e; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(247,47,154,0.3); }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0 12px; box-shadow: 0 -2px 20px rgba(247, 47, 154, 0.08); z-index: 200; border-top: 1px solid #FFCCEC; }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #999; font-size: 10px; font-weight: 500; padding: 2px 12px; cursor: pointer; background: none; border: none; position: relative; }
+        .bottom-nav .nav-item i { font-size: 22px; margin-bottom: 2px; transition: color 0.3s; }
+        .bottom-nav .nav-item.active { color: #F72F9A; }
+        .bottom-nav .nav-item.active i { color: #F72F9A; }
+        .bottom-nav .nav-item:hover { color: #F72F9A; }
+        .bottom-nav .nav-item .badge-cart { position: absolute; top: -2px; right: 4px; background: #F72F9A; color: white; font-size: 9px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .loading-state { text-align: center; padding: 60px 20px; color: #888; }
+        .loading-state .spinner { width: 40px; height: 40px; border: 4px solid #FFCCEC; border-top-color: #F72F9A; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .toast-message { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .toast-message.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-title">
+                <span class="brand-highlight">Detail</span> Produk
+            </div>
+            <button class="love-btn-header" id="headerLoveBtn" onclick="toggleFavoriteFromHeader()">
+                <i class="fas fa-heart"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- PRODUCT DETAIL -->
+    <div class="product-detail" id="productDetail">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Memuat detail produk...</p>
+        </div>
+    </div>
+
+    <!-- TOAST MESSAGE -->
+    <div class="toast-message" id="toastMessage"></div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/'"><i class="fas fa-home"></i>Beranda</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:kategori" %}'"><i class="fas fa-th-large"></i>Kategori</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:favorit" %}'"><i class="fas fa-heart"></i>Favorit</button>
+        <button class="nav-item active" onclick="window.location.href='{% url "toko:keranjang" %}'"><i class="fas fa-shopping-bag"></i>Keranjang <span class="badge-cart" id="cartBadge">0</span></button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:pesanan_saya" %}'"><i class="fas fa-receipt"></i>Pesanan</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i>Akun</button>
+    </nav>
+
+    <script>
+        // ===== CART FUNCTIONS =====
+        function getCart() { try { return JSON.parse(localStorage.getItem('cart')) || []; } catch { return []; } }
+        function saveCart(cart) { localStorage.setItem('cart', JSON.stringify(cart)); updateCartBadge(); }
+        function updateCartBadge() { const cart = getCart(); const total = cart.reduce((sum, item) => sum + item.quantity, 0); const badge = document.getElementById('cartBadge'); if (badge) { badge.textContent = total; } }
+
+        // ===== FAVORITE FUNCTIONS =====
+        function getFavorites() { try { return JSON.parse(localStorage.getItem('favorites')) || []; } catch { return []; } }
+        function saveFavorites(favorites) { localStorage.setItem('favorites', JSON.stringify(favorites)); }
+        function isFavorite(productId) { return getFavorites().includes(productId); }
+        function toggleFavorite(productId) { let favorites = getFavorites(); const index = favorites.indexOf(productId); if (index > -1) { favorites.splice(index, 1); } else { favorites.push(productId); } saveFavorites(favorites); updateLoveButton(productId); return favorites; }
+
+        function updateLoveButton(productId) {
+            const headerBtn = document.getElementById('headerLoveBtn');
+            if (headerBtn) {
+                if (isFavorite(productId)) { headerBtn.classList.add('loved'); } 
+                else { headerBtn.classList.remove('loved'); }
+            }
+        }
+
+        let currentProduct = null;
+        let currentProductId = null;
+        const productDetail = document.getElementById('productDetail');
+
+        // ===== GET PRODUCT ID FROM URL =====
+        function getProductIdFromUrl() {
+            const path = window.location.pathname;
+            const parts = path.split('/').filter(p => p !== '');
+            return parts[parts.length - 1] || '';
+        }
+
+        // ===== FETCH PRODUCT DETAIL =====
+        async function fetchProductDetail() {
+            currentProductId = getProductIdFromUrl();
+            
+            if (!currentProductId) {
+                productDetail.innerHTML = `
+                    <div style="text-align:center;padding:60px 20px;color:#888;">
+                        <i class="fas fa-exclamation-circle" style="font-size:48px;color:#FFCCEC;display:block;margin-bottom:16px;"></i>
+                        <h5>ID Produk tidak ditemukan</h5>
+                        <button onclick="window.history.back()" style="margin-top:16px;padding:10px 30px;border:none;background:#F72F9A;color:white;border-radius:12px;font-weight:600;cursor:pointer;">Kembali</button>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch('https://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline');
+                const data = await response.json();
+                
+                // ===== CARI PRODUK =====
+                // 1. Coba cari berdasarkan ID
+                currentProduct = data.find(p => {
+                    const id = String(p.id);
+                    return id === currentProductId;
+                });
+
+                // 2. Jika tidak ditemukan, coba berdasarkan nama (case insensitive)
+                if (!currentProduct) {
+                    currentProduct = data.find(p => {
+                        const name = (p.name || '').toLowerCase();
+                        return name.includes(currentProductId.toLowerCase());
+                    });
+                }
+
+                // 3. Jika masih tidak ditemukan, coba berdasarkan product_type
+                if (!currentProduct) {
+                    currentProduct = data.find(p => {
+                        const type = (p.product_type || '').toLowerCase();
+                        return type.includes(currentProductId.toLowerCase());
+                    });
+                }
+
+                if (!currentProduct) {
+                    productDetail.innerHTML = `
+                        <div style="text-align:center;padding:60px 20px;color:#888;">
+                            <i class="fas fa-exclamation-circle" style="font-size:48px;color:#FFCCEC;display:block;margin-bottom:16px;"></i>
+                            <h5>Produk tidak ditemukan</h5>
+                            <p style="color:#999;font-size:13px;">ID: ${currentProductId}</p>
+                            <button onclick="window.history.back()" style="margin-top:16px;padding:10px 30px;border:none;background:#F72F9A;color:white;border-radius:12px;font-weight:600;cursor:pointer;">Kembali</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                renderProductDetail(currentProduct);
+                updateLoveButton(currentProduct.id || currentProduct.name);
+
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                productDetail.innerHTML = `
+                    <div style="text-align:center;padding:60px 20px;color:#888;">
+                        <i class="fas fa-exclamation-circle" style="font-size:32px;color:#F72F9A;display:block;margin-bottom:12px;"></i>
+                        <p>Gagal memuat detail produk</p>
+                        <button onclick="location.reload()" style="margin-top:12px;padding:8px 24px;border:none;background:#F72F9A;color:white;border-radius:8px;cursor:pointer;">Muat Ulang</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderProductDetail(product) {
+            // ===== KONVERSI USD → IDR =====
+            const USD_TO_IDR = 16000;
+            let price = 'Rp -';
+            if (product.price) {
+                const priceInRupiah = product.price * USD_TO_IDR;
+                price = `Rp${Math.round(priceInRupiah).toLocaleString('id-ID')}`;
+            }
+            const productId = product.id || product.name;
+            
+            // Stock status - default available
+            const stockStatus = product.stock_status || 'available';
+            const stockText = stockStatus === 'available' ? '✅ Stok Tersedia' : '❌ Stok Habis';
+            const stockClass = stockStatus === 'available' ? 'available' : 'unavailable';
+
+            let starsHtml = '';
+            const rating = product.rating || 0;
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            for (let i = 0; i < 5; i++) {
+                if (i < fullStars) starsHtml += '<i class="fas fa-star"></i>';
+                else if (i === fullStars && hasHalfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                else starsHtml += '<i class="far fa-star"></i>';
+            }
+
+            const description = product.description || product.tag_list?.join(', ') || 'Deskripsi produk belum tersedia.';
+
+            productDetail.innerHTML = `
+                <div class="product-image-main">
+                    <img src="${product.image_link || 'https://via.placeholder.com/300x300?text=No+Image'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                </div>
+
+                <div class="product-title">${product.name || 'Produk'}</div>
+                <div class="product-brand-name">${product.brand || 'Maybelline'}</div>
+                
+                <div class="product-rating-detail">
+                    <span class="stars">${starsHtml}</span>
+                    <span class="review-count">${product.rating ? (product.rating * 10) : 0}% (${product.reviews || 0} reviews)</span>
+                </div>
+
+                <div class="product-price-detail">${price}</div>
+
+                <div class="stock-status ${stockClass}" id="stockStatus">${stockText}</div>
+
+                <div class="product-description">
+                    <h6>Deskripsi</h6>
+                    <p id="descText">${description.substring(0, 100)}</p>
+                    ${description.length > 100 ? `<span class="read-more" onclick="toggleDescription()">Selengkapnya ▼</span>` : ''}
+                    <p id="descFull" style="display:none;">${description}</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-cart" onclick="addToCart()">
+                        <i class="fas fa-shopping-cart"></i> Tambah ke Keranjang
+                    </button>
+                    <button class="btn-buy" onclick="buyNow()">
+                        <i class="fas fa-bolt"></i> Beli Sekarang
+                    </button>
+                </div>
+            `;
+
+            // Update header love button
+            const headerBtn = document.getElementById('headerLoveBtn');
+            if (headerBtn) {
+                headerBtn.dataset.productId = productId;
+            }
+        }
+
+        function toggleDescription() {
+            const descText = document.getElementById('descText');
+            const descFull = document.getElementById('descFull');
+            const readMore = document.querySelector('.read-more');
+            if (descFull.style.display === 'none') {
+                descText.style.display = 'none';
+                descFull.style.display = 'block';
+                readMore.textContent = 'Sembunyikan ▲';
+            } else {
+                descText.style.display = 'block';
+                descFull.style.display = 'none';
+                readMore.textContent = 'Selengkapnya ▼';
+            }
+        }
+
+        function toggleFavoriteFromHeader() {
+            if (!currentProduct) return;
+            const productId = currentProduct.id || currentProduct.name;
+            toggleFavorite(productId);
+            updateLoveButton(productId);
+            showToast(isFavorite(productId) ? '❤️ Produk ditambahkan ke favorit' : '💔 Produk dihapus dari favorit');
+        }
+
+        // ===== CART =====
+        function addToCart() {
+            if (!currentProduct) return;
+            const cart = getCart();
+            const productId = currentProduct.id || currentProduct.name;
+            const existing = cart.find(item => item.id === productId);
+            
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({
+                    id: productId,
+                    name: currentProduct.name || 'Produk',
+                    brand: currentProduct.brand || 'Maybelline',
+                    price: currentProduct.price || 0,
+                    image: currentProduct.image_link || '',
+                    quantity: 1
+                });
+            }
+            saveCart(cart);
+            showToast('✅ Produk ditambahkan ke keranjang!');
+        }
+
+        // ===== PERBAIKAN: buyNow() =====
+        function buyNow() {
+            if (!currentProduct) return;
+            
+            const productId = currentProduct.id || currentProduct.name;
+            const item = {
+                id: productId,
+                name: currentProduct.name || 'Produk',
+                brand: currentProduct.brand || 'Maybelline',
+                price: currentProduct.price || 0,
+                image: currentProduct.image_link || '',
+                quantity: 1
+            };
+            
+            // ===== SIMPAN KE checkoutItems (untuk langsung checkout) =====
+            let checkoutItems = [];
+            try {
+                checkoutItems = JSON.parse(localStorage.getItem('checkoutItems')) || [];
+            } catch { }
+            
+            const existingCheckout = checkoutItems.find(i => i.id === productId);
+            if (existingCheckout) {
+                existingCheckout.quantity += 1;
+            } else {
+                checkoutItems.push(item);
+            }
+            localStorage.setItem('checkoutItems', JSON.stringify(checkoutItems));
+            
+            // ===== JUGA SIMPAN KE cart (untuk konsistensi) =====
+            const cart = getCart();
+            const existingCart = cart.find(i => i.id === productId);
+            if (existingCart) {
+                existingCart.quantity += 1;
+            } else {
+                cart.push({...item});
+            }
+            saveCart(cart);
+            
+            showToast('✅ Produk ditambahkan! Mengarahkan ke checkout...');
+            
+            setTimeout(() => {
+                window.location.href = "{% url 'toko:checkout' %}";
+            }, 500);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toastMessage');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2000);
+        }
+
+        // ===== INIT =====
+        updateCartBadge();
+        fetchProductDetail();
+    </script>
+</body>
+</html>

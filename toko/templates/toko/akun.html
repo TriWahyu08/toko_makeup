@@ -1,0 +1,1240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akun - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(160deg, #FFF3FB 0%, #FFE8F5 50%, #FFD6EE 100%);
+            padding-bottom: 80px; 
+            color: #1a1a1a;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* ===== ANIMATED BACKGROUND ORNAMENTS ===== */
+        body::before {
+            content: '✦';
+            position: fixed;
+            top: 8%;
+            right: 8%;
+            font-size: 50px;
+            color: rgba(247, 47, 154, 0.05);
+            animation: floatOrnament 18s ease-in-out infinite;
+        }
+        body::after {
+            content: '✦';
+            position: fixed;
+            bottom: 15%;
+            left: 5%;
+            font-size: 35px;
+            color: rgba(247, 47, 154, 0.04);
+            animation: floatOrnament 22s ease-in-out infinite reverse;
+        }
+        @keyframes floatOrnament {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(25px, -25px) rotate(180deg); }
+        }
+        
+        /* ===== HEADER ===== */
+        .header { 
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 14px 20px 12px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 2px solid rgba(247, 47, 154, 0.08);
+            box-shadow: 0 4px 30px rgba(247, 47, 154, 0.06);
+        }
+        .header-top { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        .header-title { 
+            font-size: 20px; 
+            font-weight: 800; 
+            color: #1a1a1a; 
+            text-align: center; 
+            flex: 1; 
+        }
+        .header-title .brand-highlight { 
+            background: linear-gradient(135deg, #F72F9A, #C2185B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header .back-btn { 
+            background: rgba(247, 47, 154, 0.08);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            font-size: 18px;
+            color: #F72F9A;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header .back-btn:hover { 
+            background: rgba(247, 47, 154, 0.15);
+            transform: scale(1.05);
+        }
+        
+        .profile-container { padding: 16px 20px; max-width: 500px; margin: 0 auto; }
+        
+        /* ============================================================
+           PROFILE CARD
+           ============================================================ */
+        .profile-card {
+            background: linear-gradient(145deg, #F72F9A, #d6257e, #C2185B);
+            border-radius: 28px;
+            padding: 36px 24px 28px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 45px rgba(247, 47, 154, 0.30), inset 0 1px 0 rgba(255,255,255,0.15);
+            margin-bottom: 24px;
+        }
+        .profile-card .pattern-dots {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 80px;
+            height: 80px;
+            opacity: 0.08;
+            background-image: radial-gradient(circle, white 1.5px, transparent 1.5px);
+            background-size: 12px 12px;
+            pointer-events: none;
+            border-radius: 16px;
+        }
+        .profile-card .pattern-stripes {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            opacity: 0.05;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 8px,
+                white 8px,
+                white 9px
+            );
+            border-radius: 0 16px 0 0;
+        }
+        .profile-card .glow-orb {
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .profile-card .glow-orb-bottom {
+            position: absolute;
+            bottom: -60px;
+            left: -40px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .profile-card .avatar {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.35);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            font-weight: 700;
+            margin: 0 auto 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+        }
+        .profile-card .avatar::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.08);
+        }
+        .profile-card .name {
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.12);
+            letter-spacing: -0.3px;
+        }
+        .profile-card .email {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            position: relative;
+            z-index: 2;
+            font-weight: 500;
+        }
+        .profile-card .member-since {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            margin-top: 4px;
+            position: relative;
+            z-index: 2;
+            letter-spacing: 0.5px;
+        }
+        .profile-card .member-since i {
+            margin-right: 4px;
+        }
+        
+        /* ============================================================
+           STATS CARD - VIBRANT & MENONJOL
+           ============================================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        /* STAT CARD 1 - VIBRANT PINK TO MAGENTA */
+        .stat-card:first-child {
+            background: linear-gradient(145deg, #FCE4EC, #F8BBD0, #F48FB1);
+            border: 2px solid rgba(233, 30, 99, 0.25);
+            box-shadow: 0 4px 20px rgba(233, 30, 99, 0.12);
+        }
+        .stat-card:first-child .stat-icon {
+            background: linear-gradient(135deg, #C2185B, #880E4F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-card:first-child .stat-value {
+            color: #880E4F;
+        }
+        .stat-card:first-child .stat-label {
+            color: #AD1457;
+            font-weight: 600;
+        }
+        .stat-card:first-child::before {
+            background: linear-gradient(90deg, #E91E63, #9C27B0, #E91E63);
+            background-size: 200% 100%;
+        }
+        .stat-card:first-child .stat-pattern {
+            background-image: radial-gradient(circle, #E91E63 1.5px, transparent 1.5px);
+            opacity: 0.10;
+        }
+        .stat-card:first-child .stat-bg-icon {
+            color: rgba(233, 30, 99, 0.08);
+        }
+        .stat-card:first-child:hover {
+            box-shadow: 0 12px 40px rgba(233, 30, 99, 0.25);
+            border-color: rgba(233, 30, 99, 0.40);
+            transform: translateY(-6px) scale(1.02);
+        }
+        
+        /* STAT CARD 2 - VIBRANT BLUE TO TEAL */
+        .stat-card:last-child {
+            background: linear-gradient(145deg, #E3F2FD, #BBDEFB, #90CAF9);
+            border: 2px solid rgba(13, 71, 161, 0.20);
+            box-shadow: 0 4px 20px rgba(13, 71, 161, 0.10);
+        }
+        .stat-card:last-child .stat-icon {
+            background: linear-gradient(135deg, #0D47A1, #004D40);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-card:last-child .stat-value {
+            color: #0D47A1;
+        }
+        .stat-card:last-child .stat-label {
+            color: #1565C0;
+            font-weight: 600;
+        }
+        .stat-card:last-child::before {
+            background: linear-gradient(90deg, #0D47A1, #00838F, #0D47A1);
+            background-size: 200% 100%;
+        }
+        .stat-card:last-child .stat-pattern {
+            background-image: radial-gradient(circle, #0D47A1 1.5px, transparent 1.5px);
+            opacity: 0.10;
+        }
+        .stat-card:last-child .stat-bg-icon {
+            color: rgba(13, 71, 161, 0.08);
+        }
+        .stat-card:last-child:hover {
+            box-shadow: 0 12px 40px rgba(13, 71, 161, 0.25);
+            border-color: rgba(13, 71, 161, 0.40);
+            transform: translateY(-6px) scale(1.02);
+        }
+        
+        .stat-card {
+            border-radius: 20px;
+            padding: 18px 16px;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card .stat-pattern {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            pointer-events: none;
+            background-size: 10px 10px;
+            border-radius: 50%;
+            transition: all 0.8s ease;
+        }
+        .stat-card:hover .stat-pattern {
+            transform: scale(1.5) rotate(45deg);
+            opacity: 0.18 !important;
+        }
+        .stat-card .stat-stripes {
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 70px;
+            height: 70px;
+            opacity: 0.06;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 6px,
+                #F72F9A 6px,
+                #F72F9A 7px
+            );
+            border-radius: 50%;
+            transition: all 0.8s ease;
+        }
+        .stat-card:hover .stat-stripes {
+            transform: scale(1.8) rotate(-45deg);
+            opacity: 0.12;
+        }
+        .stat-card .stat-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 1s ease;
+        }
+        .stat-card:hover .stat-ring {
+            width: 160px;
+            height: 160px;
+            border-color: rgba(0,0,0,0.10);
+        }
+        .stat-card .stat-ring-2 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 1px dashed rgba(0,0,0,0.04);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 1.2s ease;
+        }
+        .stat-card:hover .stat-ring-2 {
+            width: 120px;
+            height: 120px;
+            border-color: rgba(0,0,0,0.08);
+            transform: translate(-50%, -50%) rotate(180deg);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: all 0.5s;
+        }
+        .stat-card:hover::before { 
+            opacity: 1;
+            animation: shimmerBorder 2s infinite;
+        }
+        @keyframes shimmerBorder {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .stat-card .stat-bg-icon {
+            position: absolute;
+            right: -5px;
+            bottom: -5px;
+            font-size: 55px;
+            pointer-events: none;
+            transition: all 0.6s ease;
+        }
+        .stat-card:hover .stat-bg-icon {
+            transform: scale(1.2) rotate(-10deg);
+        }
+        .stat-card .stat-icon { 
+            font-size: 24px; 
+            margin-bottom: 6px;
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+        }
+        .stat-card .stat-value { 
+            font-size: 20px; 
+            font-weight: 800; 
+            position: relative;
+            z-index: 2; 
+        }
+        .stat-card .stat-label { 
+            font-size: 11px; 
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ============================================================
+           MENU SECTION - VIBRANT & MENONJOL
+           ============================================================ */
+        .menu-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #bbb;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            padding: 0 4px 10px;
+            margin-top: 20px;
+        }
+        .menu-list {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        /* === MENU UTAMA - VIBRANT PINK TO PURPLE === */
+        .menu-list.menu-utama {
+            background: linear-gradient(145deg, #FCE4EC, #F8BBD0, #E1BEE7);
+            border-color: rgba(233, 30, 99, 0.20);
+        }
+        .menu-list.menu-utama:hover {
+            border-color: rgba(233, 30, 99, 0.35);
+            box-shadow: 0 8px 35px rgba(233, 30, 99, 0.12);
+        }
+        .menu-list.menu-utama .menu-item {
+            border-bottom: 1px solid rgba(233, 30, 99, 0.08);
+        }
+        .menu-list.menu-utama .menu-item:hover {
+            background: rgba(233, 30, 99, 0.06);
+        }
+        .menu-list.menu-utama .menu-icon.pink {
+            background: linear-gradient(135deg, #F8BBD0, #F48FB1);
+            color: #C2185B;
+        }
+        .menu-list.menu-utama .menu-icon.blue {
+            background: linear-gradient(135deg, #BBDEFB, #64B5F6);
+            color: #0D47A1;
+        }
+        
+        /* === LAINNYA - VIBRANT BLUE TO TEAL === */
+        .menu-list.menu-lainnya {
+            background: linear-gradient(145deg, #E3F2FD, #BBDEFB, #B2EBF2);
+            border-color: rgba(13, 71, 161, 0.18);
+        }
+        .menu-list.menu-lainnya:hover {
+            border-color: rgba(13, 71, 161, 0.30);
+            box-shadow: 0 8px 35px rgba(13, 71, 161, 0.12);
+        }
+        .menu-list.menu-lainnya .menu-item {
+            border-bottom: 1px solid rgba(13, 71, 161, 0.07);
+        }
+        .menu-list.menu-lainnya .menu-item:hover {
+            background: rgba(13, 71, 161, 0.06);
+        }
+        .menu-list.menu-lainnya .menu-icon.purple {
+            background: linear-gradient(135deg, #E1BEE7, #CE93D8);
+            color: #6A1B9A;
+        }
+        .menu-list.menu-lainnya .menu-icon.gray {
+            background: linear-gradient(135deg, #CFD8DC, #90A4AE);
+            color: #37474F;
+        }
+        .menu-list.menu-lainnya .menu-icon.teal {
+            background: linear-gradient(135deg, #B2EBF2, #4DD0E1);
+            color: #00695C;
+        }
+        
+        .menu-list::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(247,47,154,0.04), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 1s ease;
+        }
+        .menu-list:hover::before {
+            transform: scale(1.3);
+            opacity: 0.5;
+        }
+        .menu-list::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(247,47,154,0.03), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 1.2s ease;
+        }
+        .menu-list:hover::after {
+            transform: scale(1.2);
+        }
+        
+        .menu-list .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            background: transparent;
+            color: #1a1a1a;
+            position: relative;
+            z-index: 2;
+        }
+        .menu-list .menu-item:last-child { border-bottom: none; }
+        
+        /* === EFEK HOVER YANG LEBIH KONTRA === */
+        .menu-list .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border-radius: 0;
+        }
+        .menu-list.menu-utama .menu-item::before {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.08), transparent 60%);
+        }
+        .menu-list.menu-lainnya .menu-item::before {
+            background: linear-gradient(135deg, rgba(13, 71, 161, 0.08), transparent 60%);
+        }
+        .menu-list .menu-item:hover::before { 
+            opacity: 1; 
+        }
+        
+        /* === MOTIF TITIK === */
+        .menu-list .menu-item .item-dots {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            width: 30px;
+            height: 30px;
+            opacity: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #F72F9A 1px, transparent 1px);
+            background-size: 6px 6px;
+            transition: all 0.5s ease;
+            border-radius: 8px;
+        }
+        .menu-list .menu-item:hover .item-dots {
+            opacity: 0.08;
+            transform: scale(1.2);
+        }
+        .menu-list .menu-item:hover { 
+            padding-left: 26px; 
+        }
+        
+        .menu-list .menu-item .menu-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 17px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .menu-list .menu-item:hover .menu-icon { 
+            transform: scale(1.1) rotate(-4deg); 
+            border-color: rgba(255,255,255,0.7);
+        }
+        
+        .menu-list .menu-item .menu-text-group { flex: 1; min-width: 0; z-index: 2; position: relative; }
+        .menu-list .menu-item .menu-text { 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: #1a1a1a; 
+            display: block; 
+        }
+        .menu-list .menu-item .menu-sub { 
+            font-size: 11px; 
+            color: #777; 
+            display: block; 
+            margin-top: 1px; 
+            transition: color 0.3s;
+        }
+        .menu-list .menu-item:hover .menu-sub { 
+            color: #555; 
+        }
+        .menu-list .menu-item .arrow { 
+            color: #ddd; 
+            font-size: 14px; 
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+        .menu-list .menu-item:hover .arrow { 
+            color: #F72F9A; 
+            transform: translateX(8px) scale(1.1); 
+        }
+        
+        /* ============================================================
+           LOGOUT BUTTON
+           ============================================================ */
+        .logout-section { margin-top: 20px; }
+        .logout-section .btn-logout { 
+            width: 100%; 
+            padding: 15px; 
+            border: 2px solid rgba(211, 47, 47, 0.20);
+            background: linear-gradient(145deg, #FFEBEE, #FFCDD2);
+            color: #C62828; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            font-size: 15px; 
+            cursor: pointer; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .logout-section .btn-logout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #EF5350, #C62828);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border-radius: 18px;
+        }
+        .logout-section .btn-logout::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(211,47,47,0.06), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 0.8s ease;
+        }
+        .logout-section .btn-logout:hover::after {
+            transform: scale(3);
+        }
+        .logout-section .btn-logout:hover::before { opacity: 1; }
+        .logout-section .btn-logout:hover { 
+            border-color: #C62828; 
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 12px 40px rgba(211,47,47,0.15);
+            color: white;
+        }
+        .logout-section .btn-logout i, .logout-section .btn-logout span {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ============================================================
+           LOGOUT CONFIRM MODAL - PROFESSIONAL
+           ============================================================ */
+        .logout-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .logout-modal-overlay.show {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .logout-modal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            padding: 36px 32px 32px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalSlideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .logout-modal .modal-icon-wrapper {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+        .logout-modal .modal-icon-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(211, 47, 47, 0.10);
+        }
+        .logout-modal .modal-icon-wrapper i {
+            font-size: 32px;
+            color: #C62828;
+        }
+        .logout-modal .modal-icon-wrapper .icon-pulse {
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 2px solid rgba(211, 47, 47, 0.05);
+            animation: pulseRing 2s infinite;
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        
+        .logout-modal h3 {
+            font-weight: 800;
+            font-size: 20px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .logout-modal p {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .logout-modal p strong {
+            color: #C62828;
+        }
+        
+        .logout-modal .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .logout-modal .modal-actions button {
+            flex: 1;
+            padding: 13px 20px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+        }
+        .logout-modal .modal-actions .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+        .logout-modal .modal-actions .btn-cancel:hover {
+            background: #e8e8e8;
+            transform: translateY(-2px);
+        }
+        .logout-modal .modal-actions .btn-logout-confirm {
+            background: linear-gradient(135deg, #D32F2F, #b71c1c);
+            color: white;
+            box-shadow: 0 4px 20px rgba(211, 47, 47, 0.25);
+        }
+        .logout-modal .modal-actions .btn-logout-confirm:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 35px rgba(211, 47, 47, 0.35);
+        }
+        .logout-modal .modal-actions .btn-logout-confirm i {
+            margin-right: 6px;
+        }
+        
+        /* ============================================================
+           TOAST NOTIFICATION
+           ============================================================ */
+        .toast-message { 
+            position: fixed; 
+            bottom: 100px; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(26, 26, 26, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: white; 
+            padding: 14px 28px; 
+            border-radius: 16px; 
+            font-size: 14px; 
+            z-index: 300; 
+            opacity: 0; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none; 
+            max-width: 90%; 
+            text-align: center; 
+            box-shadow: 0 12px 50px rgba(0,0,0,0.20);
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .toast-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #F72F9A, #FF6B9D, #F72F9A);
+            background-size: 200% 100%;
+            border-radius: 16px 16px 0 0;
+            animation: toastShimmer 2s infinite;
+        }
+        @keyframes toastShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .toast-message .toast-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .toast-message .toast-text {
+            flex: 1;
+        }
+        .toast-message.show { 
+            opacity: 1; 
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* ============================================================
+           BOTTOM NAV
+           ============================================================ */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex; 
+            justify-content: space-around; 
+            padding: 6px 0 14px; 
+            z-index: 200; 
+            border-top: 1px solid rgba(247, 47, 154, 0.06);
+            box-shadow: 0 -4px 30px rgba(247, 47, 154, 0.04);
+        }
+        .bottom-nav .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none; 
+            color: #ccc; 
+            font-size: 10px; 
+            font-weight: 600; 
+            padding: 4px 12px; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+            position: relative; 
+            transition: all 0.3s;
+        }
+        .bottom-nav .nav-item i { 
+            font-size: 20px; 
+            margin-bottom: 2px; 
+            transition: all 0.3s; 
+        }
+        .bottom-nav .nav-item.active { 
+            color: #F72F9A; 
+        }
+        .bottom-nav .nav-item.active i { 
+            color: #F72F9A; 
+            transform: scale(1.1);
+        }
+        .bottom-nav .nav-item:hover { 
+            color: #F72F9A; 
+        }
+        .bottom-nav .nav-item:hover i { 
+            transform: translateY(-2px);
+        }
+        .bottom-nav .nav-item .badge-cart { 
+            position: absolute; 
+            top: -4px; 
+            right: 0px; 
+            background: linear-gradient(135deg, #F72F9A, #d6257e);
+            color: white; 
+            font-size: 9px; 
+            font-weight: 700; 
+            width: 18px; 
+            height: 18px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 2px 8px rgba(247,47,154,0.3);
+        }
+        
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 480px) { 
+            .profile-card { padding: 28px 16px 24px; }
+            .profile-card .avatar { width: 70px; height: 70px; font-size: 28px; }
+            .profile-card .name { font-size: 18px; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 14px 12px; }
+            .stat-card .stat-value { font-size: 17px; }
+            .menu-list .menu-item { padding: 12px 14px; }
+            .menu-list .menu-item .menu-icon { width: 36px; height: 36px; font-size: 14px; border-radius: 12px; }
+            .toast-message { padding: 12px 20px; font-size: 13px; bottom: 85px; }
+            .logout-modal { padding: 28px 20px 24px; }
+            .logout-modal h3 { font-size: 18px; }
+            .logout-modal .modal-actions { flex-direction: column; }
+            .logout-modal .modal-actions button { padding: 14px; }
+        }
+        
+        @media (max-width: 380px) {
+            .profile-card .avatar { width: 60px; height: 60px; font-size: 24px; }
+            .profile-card .name { font-size: 16px; }
+            .stat-card .stat-value { font-size: 15px; }
+        }
+        
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF3FB;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(247, 47, 154, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(247, 47, 154, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.location.href='/'"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-title">
+                <span class="brand-highlight">Profil</span>
+            </div>
+            <div style="width:36px;"></div>
+        </div>
+    </header>
+
+    <!-- ===== LOGOUT CONFIRM MODAL ===== -->
+    <div class="logout-modal-overlay" id="logoutModal">
+        <div class="logout-modal">
+            <div class="modal-icon-wrapper">
+                <div class="icon-pulse"></div>
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h3>Konfirmasi Keluar</h3>
+            <p>Apakah Anda yakin ingin keluar dari akun <strong>{{ user.username }}</strong>? Anda harus login kembali untuk mengakses akun Anda.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeLogoutModal()">Batal</button>
+                <button class="btn-logout-confirm" onclick="confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="profile-container">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="pattern-dots"></div>
+            <div class="pattern-stripes"></div>
+            <div class="glow-orb"></div>
+            <div class="glow-orb-bottom"></div>
+            <div class="avatar">{{ user.first_name|default:user.username|slice:":1"|upper }}</div>
+            <div class="name">{{ user.first_name|default:user.username }}</div>
+            <div class="email">{{ user.email }}</div>
+            <div class="member-since"><i class="far fa-calendar-alt"></i> Member since {{ user.date_joined|date:"M Y" }}</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-pattern"></div>
+                <div class="stat-stripes"></div>
+                <div class="stat-ring"></div>
+                <div class="stat-ring-2"></div>
+                <div class="stat-bg-icon"><i class="fas fa-star"></i></div>
+                <div class="stat-icon"><i class="fas fa-star"></i></div>
+                <div class="stat-value" id="rewardPoints">0</div>
+                <div class="stat-label">Poin Reward</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-pattern"></div>
+                <div class="stat-stripes"></div>
+                <div class="stat-ring"></div>
+                <div class="stat-ring-2"></div>
+                <div class="stat-bg-icon"><i class="fas fa-shopping-bag"></i></div>
+                <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+                <div class="stat-value" id="orderCount">5</div>
+                <div class="stat-label">Total Pesanan</div>
+            </div>
+        </div>
+
+        <!-- Menu Utama -->
+        <div class="menu-section-title">Menu Utama</div>
+        <div class="menu-list menu-utama">
+            <a class="menu-item" href="{% url 'toko:pesanan_saya' %}">
+                <div class="item-dots"></div>
+                <div class="menu-icon pink"><i class="fas fa-receipt"></i></div>
+                <div class="menu-text-group">
+                    <span class="menu-text">Riwayat Pesanan</span>
+                    <span class="menu-sub">Lihat pesanan yang pernah dibuat</span>
+                </div>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a class="menu-item" href="{% url 'toko:tambah_alamat' %}">
+                <div class="item-dots"></div>
+                <div class="menu-icon blue"><i class="fas fa-map-pin"></i></div>
+                <div class="menu-text-group">
+                    <span class="menu-text">Alamat Saya</span>
+                    <span class="menu-sub">Kelola alamat pengiriman</span>
+                </div>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+        </div>
+
+        <!-- Lainnya -->
+        <div class="menu-section-title">Lainnya</div>
+        <div class="menu-list menu-lainnya">
+            <a class="menu-item" href="{% url 'toko:ai_chat' %}">
+                <div class="item-dots"></div>
+                <div class="menu-icon purple"><i class="fas fa-robot"></i></div>
+                <div class="menu-text-group">
+                    <span class="menu-text">Bantuan & Dukungan</span>
+                    <span class="menu-sub">Chat AI untuk rekomendasi produk</span>
+                </div>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a class="menu-item" href="{% url 'toko:pengaturan' %}">
+                <div class="item-dots"></div>
+                <div class="menu-icon gray"><i class="fas fa-cog"></i></div>
+                <div class="menu-text-group">
+                    <span class="menu-text">Pengaturan</span>
+                    <span class="menu-sub">Pengaturan aplikasi</span>
+                </div>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a class="menu-item" href="#">
+                <div class="item-dots"></div>
+                <div class="menu-icon teal"><i class="fas fa-info-circle"></i></div>
+                <div class="menu-text-group">
+                    <span class="menu-text">Tentang Aplikasi</span>
+                    <span class="menu-sub">Versi aplikasi dan informasi</span>
+                </div>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+        </div>
+
+        <!-- Logout -->
+        <div class="logout-section">
+            <button class="btn-logout" onclick="openLogoutModal()">
+                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-message" id="toastMessage">
+        <span class="toast-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="toast-text" id="toastText">Pesan berhasil</span>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/'"><i class="fas fa-home"></i>Beranda</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:kategori" %}'"><i class="fas fa-th-large"></i>Kategori</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:favorit" %}'"><i class="fas fa-heart"></i>Favorit</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:keranjang" %}'"><i class="fas fa-shopping-bag"></i>Keranjang <span class="badge-cart" id="cartBadge">0</span></button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:pesanan_saya" %}'"><i class="fas fa-receipt"></i>Pesanan</button>
+        <button class="nav-item active" onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i>Akun</button>
+    </nav>
+
+    <script>
+        // ===== LOGOUT MODAL =====
+        function openLogoutModal() {
+            document.getElementById('logoutModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLogoutModal();
+            }
+        });
+
+        // Close modal by clicking outside
+        document.getElementById('logoutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLogoutModal();
+            }
+        });
+
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toastMessage');
+            const text = document.getElementById('toastText');
+            const icon = toast.querySelector('.toast-icon i');
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            icon.className = `fas ${icons[type] || icons.success}`;
+            
+            if (type === 'error') {
+                toast.style.borderColor = 'rgba(211,47,47,0.15)';
+                toast.querySelector('::before')?.style.setProperty('background', 'linear-gradient(90deg, #D32F2F, #EF5350, #D32F2F)');
+            } else if (type === 'warning') {
+                toast.style.borderColor = 'rgba(245,124,0,0.15)';
+            } else {
+                toast.style.borderColor = 'rgba(247,47,154,0.15)';
+            }
+            
+            text.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // Override showToast original
+        const originalShowToast = window.showToast;
+        window.showToast = showToast;
+
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+                document.querySelectorAll('#cartBadge').forEach(badge => {
+                    badge.textContent = total;
+                });
+            } catch { }
+        }
+        updateCartBadge();
+
+        // ===== LOAD STATS =====
+        function loadStats() {
+            try {
+                const orders = JSON.parse(localStorage.getItem('orders')) || [];
+                document.getElementById('orderCount').textContent = orders.length;
+                
+                const totalPoints = orders.reduce((sum, order) => {
+                    return sum + (order.points || 0);
+                }, 0);
+                document.getElementById('rewardPoints').textContent = totalPoints || 0;
+            } catch { }
+        }
+        loadStats();
+
+        function confirmLogout() {
+            closeLogoutModal();
+            // Redirect ke logout setelah modal tertutup
+            setTimeout(() => {
+                window.location.href = "{% url 'toko:logout' %}";
+            }, 300);
+        }
+    </script>
+</body>
+</html>

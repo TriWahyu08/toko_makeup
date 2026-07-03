@@ -1,0 +1,725 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Saya - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #FFF3FB; padding-bottom: 80px; color: #1a1a1a; }
+        
+        .header { background: white; padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(247, 47, 154, 0.08); }
+        .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .header-title { font-size: 20px; font-weight: 800; color: #1a1a1a; text-align: center; flex: 1; }
+        .header-title .brand-highlight { color: #F72F9A; }
+        .header .back-btn { background: none; border: none; font-size: 20px; color: #1a1a1a; cursor: pointer; padding: 4px; }
+        .header .back-btn:hover { color: #F72F9A; }
+        .header .refresh-btn { background: none; border: none; font-size: 18px; color: #F72F9A; cursor: pointer; padding: 4px; transition: all 0.3s; }
+        .header .refresh-btn:hover { transform: rotate(180deg); }
+        
+        .filter-tabs { display: flex; gap: 4px; padding: 12px 20px; overflow-x: auto; background: white; border-bottom: 1px solid #f0f0f0; flex-wrap: nowrap; }
+        .filter-tabs .tab { padding: 6px 16px; border-radius: 20px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; background: transparent; color: #888; white-space: nowrap; }
+        .filter-tabs .tab:hover { color: #F72F9A; }
+        .filter-tabs .tab.active { background: #F72F9A; color: white; }
+        
+        .order-list { padding: 16px 20px; max-width: 600px; margin: 0 auto; }
+        .order-card { background: white; border-radius: 16px; padding: 16px; border: 1px solid #e8e8e8; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s; }
+        .order-card:hover { border-color: #F72F9A; }
+        .order-card .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .order-card .order-id { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+        .order-card .order-date { font-size: 12px; color: #999; }
+        .order-card .order-status { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+        .order-card .order-status.menunggu { background: #FFF3E0; color: #F57C00; }
+        .order-card .order-status.dikemas { background: #E3F2FD; color: #1976D2; }
+        .order-card .order-status.dikirim { background: #F3E5F5; color: #7B1FA2; }
+        .order-card .order-status.selesai { background: #E8F5E9; color: #388E3C; }
+        .order-card .order-status.dibatalkan { background: #FFEBEE; color: #D32F2F; }
+        .order-card .order-product { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+        .order-card .order-product:last-child { border-bottom: none; }
+        .order-card .order-product .product-img { width: 50px; height: 50px; flex-shrink: 0; background: #f8f8f8; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .order-card .order-product .product-img img { max-width: 40px; max-height: 40px; object-fit: contain; }
+        .order-card .order-product .product-info { flex: 1; min-width: 0; }
+        .order-card .order-product .product-name { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+        .order-card .order-product .product-meta { font-size: 12px; color: #888; }
+        .order-card .order-product .product-price { font-size: 13px; font-weight: 700; color: #F72F9A; }
+        .order-card .order-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; margin-top: 8px; border-top: 1px solid #f5f5f5; }
+        .order-card .order-total { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+        .order-card .order-total span { color: #F72F9A; }
+        .order-card .order-actions { display: flex; gap: 8px; }
+        .order-card .order-actions button { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; }
+        .order-card .order-actions .btn-detail { background: #f0f0f0; color: #666; }
+        .order-card .order-actions .btn-detail:hover { background: #e0e0e0; }
+        .order-card .order-actions .btn-batal { background: #FFEBEE; color: #D32F2F; }
+        .order-card .order-actions .btn-batal:hover { background: #FFCDD2; }
+        .order-card .order-actions .btn-selesai { background: #E8F5E9; color: #388E3C; }
+        .order-card .order-actions .btn-selesai:hover { background: #C8E6C9; }
+        .order-card .order-actions .btn-beli-lagi { background: #F72F9A; color: white; }
+        .order-card .order-actions .btn-beli-lagi:hover { background: #d6257e; }
+        
+        .empty-orders { text-align: center; padding: 60px 20px; color: #888; }
+        .empty-orders i { font-size: 48px; color: #FFCCEC; display: block; margin-bottom: 16px; }
+        .empty-orders h5 { color: #1a1a1a; font-weight: 600; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0 12px; box-shadow: 0 -2px 20px rgba(247, 47, 154, 0.08); z-index: 200; border-top: 1px solid #FFCCEC; }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #999; font-size: 10px; font-weight: 500; padding: 2px 12px; cursor: pointer; background: none; border: none; position: relative; }
+        .bottom-nav .nav-item i { font-size: 22px; margin-bottom: 2px; transition: color 0.3s; }
+        .bottom-nav .nav-item.active { color: #F72F9A; }
+        .bottom-nav .nav-item.active i { color: #F72F9A; }
+        .bottom-nav .nav-item:hover { color: #F72F9A; }
+        .bottom-nav .nav-item .badge-cart { position: absolute; top: -2px; right: 4px; background: #F72F9A; color: white; font-size: 9px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .toast-message { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; max-width: 90%; text-align: center; }
+        .toast-message.show { opacity: 1; }
+        
+        /* ===== MODAL PROFESIONAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: white;
+            border-radius: 24px;
+            padding: 32px 28px 28px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: modalFadeIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-box .modal-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+        .modal-box .modal-icon.warning {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+        .modal-box .modal-icon.success {
+            background: #E8F5E9;
+            color: #4CAF50;
+        }
+        .modal-box .modal-icon.danger {
+            background: #FFEBEE;
+            color: #D32F2F;
+        }
+        .modal-box .modal-icon i {
+            font-size: 28px;
+        }
+        .modal-box h4 {
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .modal-box p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-box .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+        .modal-box .modal-actions .btn-modal-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+        .modal-box .modal-actions .btn-modal-cancel:hover {
+            background: #e8e8e8;
+        }
+        .modal-box .modal-actions .btn-modal-confirm {
+            background: #F72F9A;
+            color: white;
+        }
+        .modal-box .modal-actions .btn-modal-confirm:hover {
+            background: #d6257e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(247,47,154,0.3);
+        }
+        .modal-box .modal-actions .btn-modal-confirm.danger {
+            background: #D32F2F;
+        }
+        .modal-box .modal-actions .btn-modal-confirm.danger:hover {
+            background: #b71c1c;
+            box-shadow: 0 8px 25px rgba(211,47,47,0.3);
+        }
+        
+        /* Loading spinner */
+        .loading-orders {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .loading-orders .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #F72F9A;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-orders p {
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.location.href='/'"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-title">
+                <span class="brand-highlight">Pesanan</span> Saya
+            </div>
+            <button class="refresh-btn" onclick="refreshOrders()" title="Refresh Pesanan">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-icon" id="modalIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h4 id="modalTitle">Konfirmasi</h4>
+            <p id="modalMessage">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-modal-confirm" id="modalConfirmBtn" onclick="confirmModal()">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="filter-tabs" id="filterTabs">
+        <button class="tab active" data-filter="all">Semua</button>
+        <button class="tab" data-filter="menunggu">Menunggu</button>
+        <button class="tab" data-filter="dikemas">Dikemas</button>
+        <button class="tab" data-filter="dikirim">Dikirim</button>
+        <button class="tab" data-filter="selesai">Selesai</button>
+        <button class="tab" data-filter="dibatalkan">Dibatalkan</button>
+    </div>
+
+    <!-- ORDER LIST -->
+    <div class="order-list" id="orderList">
+        <!-- Loading state -->
+        <div class="loading-orders">
+            <div class="spinner"></div>
+            <p>Memuat pesanan...</p>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-message" id="toastMessage"></div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/'"><i class="fas fa-home"></i>Beranda</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:kategori" %}'"><i class="fas fa-th-large"></i>Kategori</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:favorit" %}'"><i class="fas fa-heart"></i>Favorit</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:keranjang" %}'"><i class="fas fa-shopping-bag"></i>Keranjang <span class="badge-cart" id="cartBadge">0</span></button>
+        <button class="nav-item active" onclick="window.location.href='{% url "toko:pesanan_saya" %}'"><i class="fas fa-receipt"></i>Pesanan</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i>Akun</button>
+    </nav>
+
+    <script>
+        // ===== CSRF TOKEN =====
+        function getCSRFToken() {
+            const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            return cookie ? cookie.split('=')[1] : '';
+        }
+
+        // ===== TOAST =====
+        function showToast(message) {
+            const toast = document.getElementById('toastMessage');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ===== CART BADGE =====
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+                document.querySelectorAll('#cartBadge').forEach(badge => {
+                    badge.textContent = total;
+                });
+            } catch { }
+        }
+        updateCartBadge();
+
+        // ===== GET ORDERS FROM SERVER =====
+        let currentFilter = 'all';
+        let isLoading = false;
+        let lastRefreshTime = 0;
+
+        async function fetchOrdersFromServer() {
+            try {
+                // Tambahkan timestamp untuk menghindari cache
+                const timestamp = new Date().getTime();
+                const response = await fetch(`/api/pesanan-saya/?_=${timestamp}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data pesanan');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Simpan ke localStorage sebagai cache
+                    localStorage.setItem('orders', JSON.stringify(data.orders));
+                    console.log('✅ Orders fetched:', data.orders.length);
+                    return data.orders;
+                } else {
+                    throw new Error(data.error || 'Gagal mengambil data');
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                // Fallback ke localStorage
+                return getOrdersFromLocal();
+            }
+        }
+
+        // ===== GET ORDERS FROM LOCAL (fallback) =====
+        function getOrdersFromLocal() {
+            try { 
+                return JSON.parse(localStorage.getItem('orders')) || []; 
+            } catch { 
+                return []; 
+            }
+        }
+
+        // ===== SAVE ORDERS (update status ke server) =====
+        async function saveOrdersToServer(orderId, newStatus) {
+            try {
+                const response = await fetch('/api/update-order-status/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ 
+                        order_id: orderId, 
+                        status: newStatus 
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Gagal menyimpan perubahan');
+                }
+
+                const data = await response.json();
+                return data.success;
+            } catch (error) {
+                console.error('Error saving order status:', error);
+                return false;
+            }
+        }
+
+        // ===== MODAL FUNCTIONS =====
+        let modalCallback = null;
+
+        function showModal(title, message, type = 'warning', confirmText = 'Ya, Lanjutkan', callback = null) {
+            const overlay = document.getElementById('modalOverlay');
+            const icon = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const messageEl = document.getElementById('modalMessage');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            
+            icon.className = 'modal-icon';
+            
+            if (type === 'warning') {
+                icon.classList.add('warning');
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                confirmBtn.className = 'btn-modal-confirm';
+            } else if (type === 'danger') {
+                icon.classList.add('danger');
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                confirmBtn.className = 'btn-modal-confirm danger';
+            } else if (type === 'success') {
+                icon.classList.add('success');
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                confirmBtn.className = 'btn-modal-confirm';
+            }
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            confirmBtn.textContent = confirmText;
+            
+            modalCallback = callback;
+            overlay.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            modalCallback = null;
+        }
+
+        function confirmModal() {
+            if (modalCallback) {
+                modalCallback();
+            }
+            closeModal();
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // ===== RENDER ORDERS =====
+        async function renderOrders(filter = 'all') {
+            if (isLoading) return;
+            
+            isLoading = true;
+            currentFilter = filter;
+            
+            const container = document.getElementById('orderList');
+            
+            container.innerHTML = `
+                <div class="loading-orders">
+                    <div class="spinner"></div>
+                    <p>Memuat pesanan...</p>
+                </div>
+            `;
+
+            // SELALU ambil fresh dari server
+            const orders = await fetchOrdersFromServer();
+            
+            // Jika kosong, coba dari localStorage
+            const finalOrders = orders.length > 0 ? orders : getOrdersFromLocal();
+
+            if (finalOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-receipt"></i>
+                        <h5>Belum ada pesanan</h5>
+                        <p class="text-muted">Yuk, mulai belanja produk favoritmu!</p>
+                        <button onclick="window.location.href='{% url "toko:kategori" %}'" style="margin-top:12px;padding:10px 30px;border:none;background:#F72F9A;color:white;border-radius:12px;font-weight:600;cursor:pointer;">Belanja Sekarang</button>
+                    </div>
+                `;
+                isLoading = false;
+                return;
+            }
+
+            let filtered = finalOrders;
+            if (filter !== 'all') {
+                filtered = finalOrders.filter(o => o.status === filter);
+            }
+
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-search" style="font-size:32px;color:#ddd;display:block;margin-bottom:16px;"></i>
+                        <p>Tidak ada pesanan dengan status "${filter}"</p>
+                    </div>
+                `;
+                isLoading = false;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(order => {
+                const statusClass = order.status || 'menunggu';
+                const statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+                const date = new Date(order.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                
+                const firstItem = order.items && order.items.length > 0 ? order.items[0] : null;
+                const productName = firstItem ? firstItem.name : 'Produk';
+                const productImage = firstItem && firstItem.image ? firstItem.image : 'https://via.placeholder.com/40x40?text=No+Image';
+                const totalItems = order.items ? order.items.length : 0;
+                const totalPrice = order.total || 0;
+                
+                html += `
+                    <div class="order-card" data-order-id="${order.order_id}">
+                        <div class="order-header">
+                            <span class="order-id">${order.order_id || 'INV/2026/001'}</span>
+                            <span class="order-date">${date}</span>
+                            <span class="order-status ${statusClass}">${statusLabel}</span>
+                        </div>
+                        <div class="order-product">
+                            <div class="product-img">
+                                <img src="${productImage}" alt="${productName}" onerror="this.src='https://via.placeholder.com/40x40?text=No+Image'">
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">${productName}</div>
+                                <div class="product-meta">${totalItems} item</div>
+                            </div>
+                            <div class="product-price">Rp${totalPrice.toLocaleString('id-ID')}</div>
+                        </div>
+                        <div class="order-footer">
+                            <div class="order-total">Total: <span>Rp${totalPrice.toLocaleString('id-ID')}</span></div>
+                            <div class="order-actions">
+                                <button class="btn-detail" onclick="viewDetail('${order.order_id}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${statusClass === 'menunggu' ? `
+                                    <button class="btn-batal" onclick="cancelOrder('${order.order_id}')">
+                                        <i class="fas fa-times"></i> Batal
+                                    </button>
+                                ` : ''}
+                                ${statusClass === 'dikirim' ? `
+                                    <button class="btn-selesai" onclick="completeOrder('${order.order_id}')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                ` : ''}
+                                <button class="btn-beli-lagi" onclick="orderAgain('${order.order_id}')">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            isLoading = false;
+        }
+
+        // ===== REFRESH MANUAL =====
+        async function refreshOrders() {
+            const now = Date.now();
+            if (now - lastRefreshTime < 2000) return;
+            
+            lastRefreshTime = now;
+            showToast('🔄 Memperbarui pesanan...');
+            await fetchOrdersFromServer();
+            await renderOrders(currentFilter);
+            showToast('✅ Pesanan diperbarui');
+        }
+
+        // ===== VIEW DETAIL =====
+        function viewDetail(orderId) {
+            window.location.href = `/pesanan/${orderId}/`;
+        }
+
+        // ===== CANCEL ORDER =====
+        function cancelOrder(orderId) {
+            showModal(
+                'Batalkan Pesanan',
+                'Apakah Anda yakin ingin membatalkan pesanan ini?',
+                'danger',
+                'Ya, Batalkan',
+                async function() {
+                    const success = await saveOrdersToServer(orderId, 'dibatalkan');
+                    
+                    if (success) {
+                        await fetchOrdersFromServer();
+                        await renderOrders(currentFilter);
+                        showToast('✅ Pesanan berhasil dibatalkan');
+                    } else {
+                        showToast('❌ Gagal membatalkan pesanan');
+                    }
+                }
+            );
+        }
+
+        // ===== COMPLETE ORDER =====
+        function completeOrder(orderId) {
+            showModal(
+                'Konfirmasi Penerimaan',
+                'Apakah pesanan sudah Anda terima dengan baik?',
+                'success',
+                'Ya, Sudah Diterima',
+                async function() {
+                    const success = await saveOrdersToServer(orderId, 'selesai');
+                    
+                    if (success) {
+                        await fetchOrdersFromServer();
+                        await renderOrders(currentFilter);
+                        showToast('✅ Pesanan telah selesai! Terima kasih.');
+                    } else {
+                        showToast('❌ Gagal menyelesaikan pesanan');
+                    }
+                }
+            );
+        }
+
+        // ===== ORDER AGAIN =====
+        async function orderAgain(orderId) {
+            showModal(
+                'Pesan Lagi',
+                'Tambahkan semua produk dari pesanan ini ke keranjang?',
+                'success',
+                'Ya, Tambahkan',
+                async function() {
+                    const orders = await fetchOrdersFromServer();
+                    const order = orders.find(o => o.order_id === orderId);
+                    
+                    if (order && order.items) {
+                        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                        order.items.forEach(item => {
+                            const existing = cart.find(c => c.id === item.id);
+                            if (existing) {
+                                existing.quantity += item.quantity || 1;
+                            } else {
+                                cart.push({
+                                    id: item.id,
+                                    name: item.name,
+                                    brand: item.brand || 'Maybelline',
+                                    price: item.price || 0,
+                                    image: item.image || '',
+                                    quantity: item.quantity || 1
+                                });
+                            }
+                        });
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        showToast('✅ Produk ditambahkan ke keranjang!');
+                        setTimeout(() => {
+                            window.location.href = "{% url 'toko:keranjang' %}";
+                        }, 500);
+                    }
+                }
+            );
+        }
+
+        // ===== REAL-TIME UPDATE =====
+        let updateInterval = null;
+
+        function startRealtimeUpdates() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+
+            updateInterval = setInterval(async () => {
+                try {
+                    const timestamp = new Date().getTime();
+                    const response = await fetch(`/api/pesanan-saya/?_=${timestamp}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const currentOrders = getOrdersFromLocal();
+                        const newOrders = data.orders;
+
+                        let hasChanges = false;
+                        if (currentOrders.length !== newOrders.length) {
+                            hasChanges = true;
+                        } else {
+                            for (let i = 0; i < newOrders.length; i++) {
+                                const current = currentOrders.find(o => o.order_id === newOrders[i].order_id);
+                                if (!current || current.status !== newOrders[i].status) {
+                                    hasChanges = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (hasChanges) {
+                            localStorage.setItem('orders', JSON.stringify(newOrders));
+                            await renderOrders(currentFilter);
+                            showToast('📦 Status pesanan diperbarui!');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking order updates:', error);
+                }
+            }, 5000); // 5 detik
+        }
+
+        // ===== FILTER TABS =====
+        document.querySelectorAll('.filter-tabs .tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                renderOrders(this.dataset.filter);
+            });
+        });
+
+        // ===== INIT =====
+        async function init() {
+            // Hapus cache lama
+            localStorage.removeItem('orders');
+            
+            // Ambil data dari server
+            await fetchOrdersFromServer();
+            
+            // Render orders
+            await renderOrders('all');
+            
+            // Start real-time updates
+            startRealtimeUpdates();
+            
+            // Update cart badge
+            updateCartBadge();
+            
+            // Refresh saat tab aktif kembali
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    fetchOrdersFromServer().then(() => {
+                        renderOrders(currentFilter);
+                    });
+                }
+            });
+        }
+
+        // Jalankan init saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

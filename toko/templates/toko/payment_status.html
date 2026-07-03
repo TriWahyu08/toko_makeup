@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Pembayaran - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #FFF3FB; padding-bottom: 80px; color: #1a1a1a; }
+        .header { background: white; padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(247, 47, 154, 0.08); }
+        .header-top { display: flex; align-items: center; justify-content: space-between; }
+        .header-title { font-size: 18px; font-weight: 700; color: #1a1a1a; flex: 1; text-align: center; }
+        .header-title .brand-highlight { color: #F72F9A; }
+        .header .back-btn { background: none; border: none; font-size: 20px; color: #1a1a1a; cursor: pointer; padding: 4px; }
+        .header .back-btn:hover { color: #F72F9A; }
+        .status-container { padding: 40px 20px; max-width: 500px; margin: 0 auto; text-align: center; }
+        .status-card { background: white; border-radius: 20px; padding: 40px 30px; border: 1px solid #e8e8e8; box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
+        .status-icon { font-size: 64px; margin-bottom: 16px; }
+        .status-icon.pending { color: #FF9800; }
+        .status-icon.success { color: #4CAF50; }
+        .status-icon.failed { color: #D32F2F; }
+        .status-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .status-subtitle { color: #888; font-size: 14px; }
+        .order-id { background: #f5f5f5; padding: 10px; border-radius: 10px; font-size: 14px; margin: 16px 0; }
+        .order-id strong { color: #1a1a1a; }
+        .btn-status { padding: 12px 40px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; margin: 8px; }
+        .btn-check-status { background: #F72F9A; color: white; }
+        .btn-check-status:hover { background: #d6257e; transform: translateY(-2px); }
+        .btn-home { background: #e8e8e8; color: #666; }
+        .btn-home:hover { background: #ddd; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0 12px; box-shadow: 0 -2px 20px rgba(247, 47, 154, 0.08); z-index: 200; border-top: 1px solid #FFCCEC; }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #999; font-size: 10px; font-weight: 500; padding: 2px 12px; cursor: pointer; background: none; border: none; }
+        .bottom-nav .nav-item i { font-size: 22px; margin-bottom: 2px; transition: color 0.3s; }
+        .bottom-nav .nav-item.active { color: #F72F9A; }
+        .bottom-nav .nav-item.active i { color: #F72F9A; }
+        .bottom-nav .nav-item:hover { color: #F72F9A; }
+        .bottom-nav .nav-item .badge-cart { position: absolute; top: -2px; right: 4px; background: #F72F9A; color: white; font-size: 9px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .toast-message { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; max-width: 90%; text-align: center; }
+        .toast-message.show { opacity: 1; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #FFCCEC; border-top-color: #F72F9A; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.location.href='/'"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-title">
+                <span class="brand-highlight">Status</span> Pembayaran
+            </div>
+            <div style="width:36px;"></div>
+        </div>
+    </header>
+
+    <!-- STATUS CONTENT -->
+    <div class="status-container" id="statusContainer">
+        <div class="status-card">
+            <div class="spinner" id="loadingSpinner"></div>
+            <div id="statusContent" style="display:none;">
+                <div class="status-icon" id="statusIcon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="status-title" id="statusTitle">Menunggu Pembayaran</div>
+                <div class="status-subtitle" id="statusSubtitle">Silakan selesaikan pembayaran Anda</div>
+                <div class="order-id">
+                    <strong>Order ID:</strong> <span id="orderIdDisplay">{{ order_id|default:'-' }}</span>
+                </div>
+                <div id="paymentDetails" style="margin:16px 0;padding:16px;background:#f8f8f8;border-radius:12px;display:none;">
+                    <!-- Will be filled by JS -->
+                </div>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
+                    <button class="btn-status btn-check-status" onclick="checkStatus()">
+                        <i class="fas fa-sync-alt"></i> Cek Status
+                    </button>
+                    <button class="btn-status btn-home" onclick="window.location.href='/'">
+                        <i class="fas fa-home"></i> Beranda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-message" id="toastMessage"></div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/'"><i class="fas fa-home"></i>Beranda</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:kategori" %}'"><i class="fas fa-th-large"></i>Kategori</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:favorit" %}'"><i class="fas fa-heart"></i>Favorit</button>
+        <button class="nav-item active" onclick="window.location.href='{% url "toko:keranjang" %}'"><i class="fas fa-shopping-bag"></i>Keranjang <span class="badge-cart" id="cartBadge">0</span></button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i>Akun</button>
+    </nav>
+
+    <script>
+        const orderId = '{{ order_id }}';
+        let statusCheckInterval = null;
+
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+                document.querySelectorAll('#cartBadge').forEach(badge => {
+                    badge.textContent = total;
+                });
+            } catch { }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toastMessage');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function getCSRFToken() {
+            const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            return cookie ? cookie.split('=')[1] : '';
+        }
+
+        async function checkStatus() {
+            try {
+                showToast('🔄 Mengecek status pembayaran...');
+                const response = await fetch(`/api/payment-status/${orderId}/`);
+                const data = await response.json();
+                updateStatusUI(data);
+            } catch (error) {
+                console.error('Error checking status:', error);
+                showToast('❌ Gagal cek status pembayaran');
+            }
+        }
+
+        function updateStatusUI(data) {
+            const status = data.transaction_status || data.status || 'pending';
+            const icon = document.getElementById('statusIcon');
+            const title = document.getElementById('statusTitle');
+            const subtitle = document.getElementById('statusSubtitle');
+            const details = document.getElementById('paymentDetails');
+
+            // Reset interval jika status sudah final
+            if (status === 'settlement' || status === 'capture' || status === 'success' || status === 'expire' || status === 'deny') {
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval);
+                    statusCheckInterval = null;
+                }
+            }
+
+            if (status === 'settlement' || status === 'capture' || status === 'success') {
+                icon.className = 'status-icon success';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                title.textContent = '✅ Pembayaran Berhasil!';
+                subtitle.textContent = 'Terima kasih telah berbelanja di MyBelin!';
+                details.style.display = 'none';
+                showToast('🎉 Pembayaran berhasil!');
+            } else if (status === 'pending') {
+                icon.className = 'status-icon pending';
+                icon.innerHTML = '<i class="fas fa-clock"></i>';
+                title.textContent = '⏳ Menunggu Pembayaran';
+                subtitle.textContent = 'Silakan selesaikan pembayaran Anda';
+                details.style.display = 'block';
+                details.innerHTML = `
+                    <p style="font-size:13px;color:#666;">Status: <strong>Menunggu pembayaran</strong></p>
+                    <p style="font-size:13px;color:#666;">Order ID: <strong>${orderId}</strong></p>
+                    <button onclick="checkStatus()" style="margin-top:8px;padding:6px 16px;border:none;background:#F72F9A;color:white;border-radius:8px;cursor:pointer;">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                `;
+            } else if (status === 'expire' || status === 'deny' || status === 'failed') {
+                icon.className = 'status-icon failed';
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                title.textContent = '❌ Pembayaran Gagal';
+                subtitle.textContent = 'Silakan coba lagi atau hubungi customer service';
+                details.style.display = 'none';
+                showToast('❌ Pembayaran gagal, silakan coba lagi');
+            } else {
+                icon.className = 'status-icon pending';
+                icon.innerHTML = '<i class="fas fa-clock"></i>';
+                title.textContent = '⏳ Memproses...';
+                subtitle.textContent = `Status: ${status}`;
+            }
+
+            // Sembunyikan loading
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('statusContent').style.display = 'block';
+        }
+
+        // ===== INIT =====
+        updateCartBadge();
+
+        // Tampilkan loading dulu
+        document.getElementById('loadingSpinner').style.display = 'block';
+        document.getElementById('statusContent').style.display = 'none';
+
+        // Cek status pertama kali
+        setTimeout(() => {
+            checkStatus();
+        }, 1000);
+
+        // Cek status setiap 5 detik (auto-refresh)
+        statusCheckInterval = setInterval(() => {
+            const statusIcon = document.getElementById('statusIcon');
+            // Hanya cek jika masih pending
+            if (statusIcon && statusIcon.className.includes('pending')) {
+                checkStatus();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

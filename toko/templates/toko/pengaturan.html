@@ -1,0 +1,759 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(160deg, #FFF3FB 0%, #FFE8F5 50%, #FFD6EE 100%);
+            padding-bottom: 80px; 
+            color: #1a1a1a;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* ===== ANIMATED BACKGROUND ===== */
+        body::before {
+            content: '✦';
+            position: fixed;
+            top: 10%;
+            right: 8%;
+            font-size: 45px;
+            color: rgba(247, 47, 154, 0.04);
+            animation: floatOrnament 18s ease-in-out infinite;
+        }
+        body::after {
+            content: '✦';
+            position: fixed;
+            bottom: 20%;
+            left: 5%;
+            font-size: 30px;
+            color: rgba(247, 47, 154, 0.03);
+            animation: floatOrnament 22s ease-in-out infinite reverse;
+        }
+        @keyframes floatOrnament {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, -20px) rotate(180deg); }
+        }
+        
+        /* ===== HEADER ===== */
+        .header { 
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 14px 20px 12px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 2px solid rgba(247, 47, 154, 0.08);
+            box-shadow: 0 4px 30px rgba(247, 47, 154, 0.06);
+        }
+        .header-top { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        .header-title { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: #1a1a1a; 
+            flex: 1; 
+            text-align: center; 
+            letter-spacing: -0.3px;
+        }
+        .header-title .brand-highlight { 
+            background: linear-gradient(135deg, #F72F9A, #C2185B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header .back-btn { 
+            background: rgba(247, 47, 154, 0.08);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            font-size: 18px;
+            color: #F72F9A;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header .back-btn:hover { 
+            background: rgba(247, 47, 154, 0.15);
+            transform: scale(1.05);
+        }
+        
+        .settings-container { padding: 16px 20px; max-width: 500px; margin: 0 auto; }
+        
+        /* ===== SECTION TITLE ===== */
+        .settings-section { margin-bottom: 24px; }
+        .settings-section .section-title { 
+            font-size: 11px; 
+            font-weight: 700; 
+            color: #999; 
+            text-transform: uppercase; 
+            letter-spacing: 1.8px; 
+            padding: 0 4px 10px; 
+        }
+        
+        /* ============================================================
+           SETTINGS CARD - WARNA TEGAS
+           ============================================================ */
+        .settings-card { 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        /* === CARD UMUM - VIBRANT PINK TEGAS === */
+        .settings-card.card-umum {
+            background: linear-gradient(145deg, #FCE4EC, #F8BBD0, #F48FB1);
+            border-color: rgba(233, 30, 99, 0.25);
+        }
+        .settings-card.card-umum:hover {
+            border-color: rgba(233, 30, 99, 0.40);
+            box-shadow: 0 8px 35px rgba(233, 30, 99, 0.12);
+        }
+        .settings-card.card-umum .settings-item {
+            border-bottom: 1px solid rgba(233, 30, 99, 0.10);
+        }
+        .settings-card.card-umum .settings-item:hover {
+            background: rgba(233, 30, 99, 0.08);
+        }
+        .settings-card.card-umum .icon.pink {
+            background: linear-gradient(135deg, #F48FB1, #EC407A);
+            color: #880E4F;
+        }
+        .settings-card.card-umum .icon.purple {
+            background: linear-gradient(135deg, #CE93D8, #AB47BC);
+            color: #4A148C;
+        }
+        .settings-card.card-umum .icon.blue {
+            background: linear-gradient(135deg, #64B5F6, #1E88E5);
+            color: #0D47A1;
+        }
+        .settings-card.card-umum .info .title {
+            color: #4A148C;
+        }
+        .settings-card.card-umum .info .desc {
+            color: #6A1B9A;
+        }
+        
+        /* === CARD LAINNYA - VIBRANT BLUE TEGAS === */
+        .settings-card.card-lainnya {
+            background: linear-gradient(145deg, #E3F2FD, #BBDEFB, #90CAF9);
+            border-color: rgba(13, 71, 161, 0.20);
+        }
+        .settings-card.card-lainnya:hover {
+            border-color: rgba(13, 71, 161, 0.35);
+            box-shadow: 0 8px 35px rgba(13, 71, 161, 0.12);
+        }
+        .settings-card.card-lainnya .settings-item {
+            border-bottom: 1px solid rgba(13, 71, 161, 0.08);
+        }
+        .settings-card.card-lainnya .settings-item:hover {
+            background: rgba(13, 71, 161, 0.08);
+        }
+        .settings-card.card-lainnya .icon.green {
+            background: linear-gradient(135deg, #81C784, #43A047);
+            color: #1B5E20;
+        }
+        .settings-card.card-lainnya .icon.purple {
+            background: linear-gradient(135deg, #CE93D8, #AB47BC);
+            color: #4A148C;
+        }
+        .settings-card.card-lainnya .icon.gray {
+            background: linear-gradient(135deg, #90A4AE, #546E7A);
+            color: #263238;
+        }
+        .settings-card.card-lainnya .info .title {
+            color: #0D47A1;
+        }
+        .settings-card.card-lainnya .info .desc {
+            color: #1565C0;
+        }
+        
+        /* === SETTINGS ITEM === */
+        .settings-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 14px 18px; 
+            cursor: pointer; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+        }
+        .settings-item:last-child { border-bottom: none; }
+        
+        /* === EFEK GLOW PADA ITEM === */
+        .settings-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .settings-card.card-umum .settings-item::before {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.10), transparent 60%);
+        }
+        .settings-card.card-lainnya .settings-item::before {
+            background: linear-gradient(135deg, rgba(13, 71, 161, 0.10), transparent 60%);
+        }
+        .settings-item:hover::before { opacity: 1; }
+        
+        .settings-item .icon { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-shrink: 0; 
+            margin-right: 14px;
+            font-size: 17px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid rgba(255,255,255,0.4);
+            position: relative;
+            z-index: 2;
+        }
+        .settings-item:hover .icon { 
+            transform: scale(1.1) rotate(-4deg); 
+            border-color: rgba(255,255,255,0.7);
+        }
+        
+        .settings-item .info { 
+            flex: 1; 
+            min-width: 0; 
+            position: relative;
+            z-index: 2;
+        }
+        .settings-item .info .title { 
+            font-size: 14px; 
+            font-weight: 700; 
+        }
+        .settings-item .info .desc { 
+            font-size: 12px; 
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+        
+        /* === TOGGLE SWITCH === */
+        .settings-item .toggle { 
+            position: relative; 
+            width: 48px; 
+            height: 26px; 
+            flex-shrink: 0; 
+            cursor: pointer;
+            z-index: 2;
+        }
+        .settings-item .toggle input { opacity: 0; width: 0; height: 0; }
+        .settings-item .toggle .slider { 
+            position: absolute; 
+            inset: 0; 
+            background: #ddd; 
+            border-radius: 13px; 
+            transition: all 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .settings-item .toggle .slider::before { 
+            content: ''; 
+            position: absolute; 
+            height: 20px; 
+            width: 20px; 
+            left: 3px; 
+            bottom: 3px; 
+            background: white; 
+            border-radius: 50%; 
+            transition: all 0.3s; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .settings-item .toggle input:checked + .slider { 
+            background: linear-gradient(135deg, #F72F9A, #d6257e);
+            box-shadow: 0 2px 12px rgba(247,47,154,0.4);
+        }
+        .settings-item .toggle input:checked + .slider::before { transform: translateX(22px); }
+        
+        /* === ARROW === */
+        .settings-item .arrow { 
+            color: rgba(0,0,0,0.15); 
+            font-size: 14px; 
+            margin-left: 8px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 2;
+        }
+        .settings-item:hover .arrow { 
+            color: #F72F9A; 
+            transform: translateX(6px) scale(1.1); 
+        }
+        
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 32px 28px 28px;
+            max-width: 400px;
+            width: 100%;
+            animation: modalFadeIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border: 1px solid rgba(247,47,154,0.06);
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-box .modal-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+        .modal-box .modal-icon.warning {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            color: #E65100;
+        }
+        .modal-box .modal-icon.danger {
+            background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+            color: #C62828;
+        }
+        .modal-box .modal-icon i { font-size: 28px; }
+        .modal-box h4 { font-weight: 700; color: #1a1a1a; margin-bottom: 4px; text-align: center; }
+        .modal-box p { font-size: 14px; color: #666; margin-bottom: 20px; text-align: center; line-height: 1.6; }
+        .modal-box .modal-actions { display: flex; gap: 10px; }
+        .modal-box .modal-actions button {
+            flex: 1; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; font-size: 14px;
+        }
+        .modal-box .modal-actions .btn-modal-cancel { background: #f5f5f5; color: #666; }
+        .modal-box .modal-actions .btn-modal-cancel:hover { background: #e8e8e8; }
+        .modal-box .modal-actions .btn-modal-confirm { background: linear-gradient(135deg, #F72F9A, #d6257e); color: white; }
+        .modal-box .modal-actions .btn-modal-confirm:hover { background: #d6257e; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(247,47,154,0.3); }
+        .modal-box .modal-actions .btn-modal-confirm.danger { background: linear-gradient(135deg, #D32F2F, #b71c1c); color: white; }
+        .modal-box .modal-actions .btn-modal-confirm.danger:hover { background: #b71c1c; box-shadow: 0 8px 25px rgba(211,47,47,0.3); }
+        
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex; 
+            justify-content: space-around; 
+            padding: 6px 0 14px; 
+            z-index: 200; 
+            border-top: 1px solid rgba(247, 47, 154, 0.06);
+            box-shadow: 0 -4px 30px rgba(247, 47, 154, 0.04);
+        }
+        .bottom-nav .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none; 
+            color: #ccc; 
+            font-size: 10px; 
+            font-weight: 600; 
+            padding: 4px 12px; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+            position: relative; 
+            transition: all 0.3s;
+        }
+        .bottom-nav .nav-item i { 
+            font-size: 20px; 
+            margin-bottom: 2px; 
+            transition: all 0.3s; 
+        }
+        .bottom-nav .nav-item.active { 
+            color: #F72F9A; 
+        }
+        .bottom-nav .nav-item.active i { 
+            color: #F72F9A; 
+            transform: scale(1.1);
+        }
+        .bottom-nav .nav-item:hover { 
+            color: #F72F9A; 
+        }
+        .bottom-nav .nav-item:hover i { 
+            transform: translateY(-2px);
+        }
+        .bottom-nav .nav-item .badge-cart { 
+            position: absolute; 
+            top: -4px; 
+            right: -4px; 
+            background: linear-gradient(135deg, #F72F9A, #d6257e);
+            color: white; 
+            font-size: 9px; 
+            font-weight: 700; 
+            width: 18px; 
+            height: 18px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(247,47,154,0.3);
+        }
+        
+        /* ===== TOAST ===== */
+        .toast-message { 
+            position: fixed; 
+            bottom: 100px; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(26, 26, 26, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: white; 
+            padding: 14px 28px; 
+            border-radius: 16px; 
+            font-size: 14px; 
+            z-index: 300; 
+            opacity: 0; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none; 
+            max-width: 90%; 
+            text-align: center; 
+            box-shadow: 0 12px 50px rgba(0,0,0,0.20);
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .toast-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #F72F9A, #FF6B9D, #F72F9A);
+            background-size: 200% 100%;
+            border-radius: 16px 16px 0 0;
+            animation: toastShimmer 2s infinite;
+        }
+        @keyframes toastShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .toast-message .toast-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .toast-message .toast-text {
+            flex: 1;
+        }
+        .toast-message.show { 
+            opacity: 1; 
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .settings-item { padding: 12px 14px; }
+            .settings-item .icon { width: 36px; height: 36px; font-size: 15px; border-radius: 12px; }
+            .settings-item .toggle { width: 42px; height: 22px; }
+            .settings-item .toggle .slider::before { height: 16px; width: 16px; left: 3px; bottom: 3px; }
+            .settings-item .toggle input:checked + .slider::before { transform: translateX(20px); }
+            .toast-message { padding: 12px 20px; font-size: 13px; bottom: 85px; }
+        }
+        
+        @media (max-width: 380px) {
+            .settings-item .icon { width: 32px; height: 32px; font-size: 13px; margin-right: 10px; }
+            .settings-item .info .title { font-size: 13px; }
+            .settings-item .info .desc { font-size: 11px; }
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF3FB;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(247, 47, 154, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(247, 47, 154, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.location.href='/'"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-title">
+                <span class="brand-highlight">Pengaturan</span>
+            </div>
+            <div style="width:36px;"></div>
+        </div>
+    </header>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-icon" id="modalIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h4 id="modalTitle">Konfirmasi</h4>
+            <p id="modalMessage">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-modal-confirm" id="modalConfirmBtn" onclick="confirmModal()">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="settings-container">
+        
+        <!-- Umum -->
+        <div class="settings-section">
+            <div class="section-title">Umum</div>
+            <div class="settings-card card-umum">
+                <div class="settings-item" onclick="toggleNotif()">
+                    <div class="icon pink"><i class="fas fa-bell"></i></div>
+                    <div class="info">
+                        <div class="title">Notifikasi</div>
+                        <div class="desc">Terima notifikasi pesanan dan promo</div>
+                    </div>
+                    <div class="toggle">
+                        <input type="checkbox" id="notifToggle" checked>
+                        <span class="slider"></span>
+                    </div>
+                </div>
+                <div class="settings-item" onclick="toggleDarkMode()">
+                    <div class="icon purple"><i class="fas fa-moon"></i></div>
+                    <div class="info">
+                        <div class="title">Mode Gelap</div>
+                        <div class="desc">Tampilan lebih nyaman di malam hari</div>
+                    </div>
+                    <div class="toggle">
+                        <input type="checkbox" id="darkToggle">
+                        <span class="slider"></span>
+                    </div>
+                </div>
+                <div class="settings-item" onclick="showToast('🌏 Bahasa akan segera hadir!')">
+                    <div class="icon blue"><i class="fas fa-globe"></i></div>
+                    <div class="info">
+                        <div class="title">Bahasa</div>
+                        <div class="desc">Pilih bahasa aplikasi</div>
+                    </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lainnya -->
+        <div class="settings-section">
+            <div class="section-title">Lainnya</div>
+            <div class="settings-card card-lainnya">
+                <div class="settings-item" onclick="showToast('📱 MyBelin v1.0.0')">
+                    <div class="icon green"><i class="fas fa-info-circle"></i></div>
+                    <div class="info">
+                        <div class="title">Versi Aplikasi</div>
+                        <div class="desc">v1.0.0 · Terbaru</div>
+                    </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </div>
+                <div class="settings-item" onclick="showToast('📄 Buka halaman bantuan untuk kebijakan privasi')">
+                    <div class="icon purple"><i class="fas fa-file-alt"></i></div>
+                    <div class="info">
+                        <div class="title">Kebijakan Privasi</div>
+                        <div class="desc">Baca kebijakan privasi kami</div>
+                    </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </div>
+                <div class="settings-item" onclick="showToast('📋 Buka halaman bantuan untuk syarat & ketentuan')">
+                    <div class="icon gray"><i class="fas fa-scroll"></i></div>
+                    <div class="info">
+                        <div class="title">Syarat & Ketentuan</div>
+                        <div class="desc">Baca syarat dan ketentuan</div>
+                    </div>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/'"><i class="fas fa-home"></i>Beranda</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:kategori" %}'"><i class="fas fa-th-large"></i>Kategori</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:favorit" %}'"><i class="fas fa-heart"></i>Favorit</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:keranjang" %}'"><i class="fas fa-shopping-bag"></i>Keranjang <span class="badge-cart" id="cartBadge">0</span></button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:pesanan_saya" %}'"><i class="fas fa-receipt"></i>Pesanan</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i>Akun</button>
+    </nav>
+
+    <!-- TOAST -->
+    <div class="toast-message" id="toastMessage">
+        <span class="toast-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="toast-text" id="toastText">Pesan berhasil</span>
+    </div>
+
+    <script>
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toastMessage');
+            const text = document.getElementById('toastText');
+            const icon = toast.querySelector('.toast-icon i');
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            icon.className = `fas ${icons[type] || icons.success}`;
+            
+            if (type === 'error') {
+                toast.style.borderColor = 'rgba(211,47,47,0.15)';
+                toast.querySelector('::before')?.style.setProperty('background', 'linear-gradient(90deg, #D32F2F, #EF5350, #D32F2F)');
+            } else if (type === 'warning') {
+                toast.style.borderColor = 'rgba(245,124,0,0.15)';
+            } else {
+                toast.style.borderColor = 'rgba(247,47,154,0.15)';
+            }
+            
+            text.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ===== CART BADGE =====
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+                document.querySelectorAll('#cartBadge').forEach(badge => {
+                    badge.textContent = total;
+                });
+            } catch { }
+        }
+        updateCartBadge();
+
+        // ===== MODAL =====
+        let modalCallback = null;
+
+        function showModal(title, message, type = 'warning', confirmText = 'Ya, Lanjutkan', callback = null) {
+            const overlay = document.getElementById('modalOverlay');
+            const icon = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const messageEl = document.getElementById('modalMessage');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            
+            icon.className = 'modal-icon';
+            
+            if (type === 'warning') {
+                icon.classList.add('warning');
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                confirmBtn.className = 'btn-modal-confirm';
+            } else if (type === 'danger') {
+                icon.classList.add('danger');
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                confirmBtn.className = 'btn-modal-confirm danger';
+            }
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            confirmBtn.textContent = confirmText;
+            modalCallback = callback;
+            overlay.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            modalCallback = null;
+        }
+
+        function confirmModal() {
+            if (modalCallback) {
+                modalCallback();
+            }
+            closeModal();
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ===== TOGGLE NOTIFICATION =====
+        function toggleNotif() {
+            const toggle = document.getElementById('notifToggle');
+            toggle.checked = !toggle.checked;
+            showToast(toggle.checked ? '🔔 Notifikasi diaktifkan' : '🔕 Notifikasi dinonaktifkan');
+        }
+
+        // ===== TOGGLE DARK MODE =====
+        function toggleDarkMode() {
+            const toggle = document.getElementById('darkToggle');
+            toggle.checked = !toggle.checked;
+            if (toggle.checked) {
+                document.body.style.background = '#1a1a1a';
+                document.body.style.color = '#f0f0f0';
+                document.querySelectorAll('.settings-card, .settings-item, .header, .bottom-nav').forEach(el => {
+                    el.style.background = '#2a2a2a';
+                    el.style.borderColor = '#333';
+                });
+                document.querySelectorAll('.info .title').forEach(el => el.style.color = '#f0f0f0');
+                document.querySelectorAll('.info .desc, .settings-item .arrow').forEach(el => el.style.color = '#888');
+                showToast('🌙 Mode gelap diaktifkan');
+            } else {
+                document.body.style.background = '#FFF3FB';
+                document.body.style.color = '#1a1a1a';
+                document.querySelectorAll('.settings-card, .settings-item, .header, .bottom-nav').forEach(el => {
+                    el.style.background = '';
+                    el.style.borderColor = '';
+                });
+                document.querySelectorAll('.info .title').forEach(el => el.style.color = '#1a1a1a');
+                document.querySelectorAll('.info .desc, .settings-item .arrow').forEach(el => el.style.color = '#999');
+                showToast('☀️ Mode terang diaktifkan');
+            }
+        }
+    </script>
+</body>
+</html>

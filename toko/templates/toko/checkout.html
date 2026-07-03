@@ -1,0 +1,1433 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #FFF3FB; padding-bottom: 100px; color: #1a1a1a; }
+        
+        .header { background: white; padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(247, 47, 154, 0.08); }
+        .header-top { display: flex; align-items: center; justify-content: space-between; }
+        .header-title { font-size: 18px; font-weight: 700; color: #1a1a1a; flex: 1; text-align: center; }
+        .header-title .brand-highlight { color: #F72F9A; }
+        .header .back-btn { background: none; border: none; font-size: 20px; color: #1a1a1a; cursor: pointer; padding: 4px; }
+        .header .back-btn:hover { color: #F72F9A; }
+        
+        .checkout-container { padding: 16px 20px; max-width: 600px; margin: 0 auto; }
+        
+        .section-title { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: #F72F9A; }
+        .section-title .btn-add-address {
+            margin-left: auto;
+            padding: 4px 14px;
+            background: #F72F9A;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .section-title .btn-add-address:hover {
+            background: #d6257e;
+            transform: scale(1.05);
+        }
+        
+        /* ===== ADDRESS CARDS - PERBAIKAN ===== */
+        .address-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .address-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 2px solid #e8e8e8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .address-card:hover {
+            border-color: #F72F9A;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(247,47,154,0.12);
+        }
+        .address-card.selected {
+            border-color: #F72F9A;
+            background: #FFF5F8;
+            box-shadow: 0 0 0 3px rgba(247,47,154,0.15), 0 4px 15px rgba(247,47,154,0.1);
+        }
+        .address-card input[type="radio"] {
+            accent-color: #F72F9A;
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .address-card .address-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .address-card .address-label {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+        .address-card .address-detail {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .address-card .address-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .address-card .address-actions button {
+            background: none;
+            border: none;
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .address-card .address-actions .btn-edit:hover {
+            color: #F72F9A;
+            background: #FFF3FB;
+        }
+        .address-card .address-actions .btn-delete:hover {
+            color: #D32F2F;
+            background: #FFEBEE;
+        }
+        
+        .no-address {
+            text-align: center;
+            padding: 30px 20px;
+            color: #888;
+            background: white;
+            border-radius: 16px;
+            border: 2px dashed #e8e8e8;
+        }
+        .no-address i {
+            font-size: 32px;
+            color: #FFCCEC;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        /* ===== ADDRESS FORM ===== */
+        .address-form {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .address-form.show {
+            display: block;
+        }
+        .address-form .form-group {
+            margin-bottom: 12px;
+        }
+        .address-form .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a1a1a;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .address-form .form-group input,
+        .address-form .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e8e8e8;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+        .address-form .form-group input:focus,
+        .address-form .form-group select:focus {
+            border-color: #F72F9A;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(247,47,154,0.08);
+        }
+        .address-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .address-form .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .address-form .btn-save-address {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #F72F9A;
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .address-form .btn-save-address:hover {
+            background: #d6257e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(247,47,154,0.3);
+        }
+        .address-form .btn-cancel-address {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e8e8e8;
+            background: white;
+            color: #666;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .address-form .btn-cancel-address:hover {
+            border-color: #F72F9A;
+            color: #F72F9A;
+        }
+        
+        /* ===== SHIPPING OPTIONS ===== */
+        .shipping-options {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 16px;
+        }
+        .shipping-options .shipping-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .shipping-options .shipping-option:last-child {
+            border-bottom: none;
+        }
+        .shipping-options .shipping-option:hover {
+            background: #FFF3FB;
+            margin: 0 -8px;
+            padding-left: 8px;
+            padding-right: 8px;
+            border-radius: 8px;
+        }
+        .shipping-options .shipping-option input[type="radio"] {
+            accent-color: #F72F9A;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .shipping-options .shipping-option .shipping-label {
+            font-size: 14px;
+            color: #1a1a1a;
+            flex: 1;
+        }
+        .shipping-options .shipping-option .shipping-price {
+            font-weight: 700;
+            color: #F72F9A;
+        }
+        .shipping-options .shipping-loading {
+            text-align: center;
+            padding: 16px;
+            color: #888;
+        }
+        .shipping-options .shipping-loading .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #FFCCEC;
+            border-top-color: #F72F9A;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .product-item-checkout { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; align-items: center; }
+        .product-item-checkout:last-child { border-bottom: none; }
+        .product-item-checkout .item-image { width: 50px; height: 50px; flex-shrink: 0; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #f0f0f0; }
+        .product-item-checkout .item-image img { width: 100%; height: 100%; object-fit: contain; max-height: 40px; }
+        .product-item-checkout .item-info { flex: 1; min-width: 0; }
+        .product-item-checkout .item-name { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+        .product-item-checkout .item-brand { font-size: 11px; color: #999; }
+        .product-item-checkout .item-price { font-size: 13px; font-weight: 700; color: #F72F9A; }
+        .product-item-checkout .item-qty { font-size: 12px; color: #888; }
+        
+        .payment-method { background: white; border-radius: 16px; padding: 16px; border: 1px solid #e8e8e8; margin: 16px 0; }
+        .payment-method .method-option { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; cursor: pointer; }
+        .payment-method .method-option:last-child { border-bottom: none; }
+        .payment-method .method-option input[type="radio"] { accent-color: #F72F9A; width: 18px; height: 18px; cursor: pointer; }
+        .payment-method .method-option .method-label { font-size: 14px; color: #1a1a1a; }
+        .payment-method .method-option .method-icon { font-size: 20px; color: #F72F9A; }
+        
+        .summary-checkout { background: white; border-radius: 16px; padding: 16px; border: 1px solid #e8e8e8; }
+        .summary-checkout .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #666; }
+        .summary-checkout .summary-row.total { font-weight: 700; font-size: 18px; color: #1a1a1a; border-top: 2px solid #f0f0f0; padding-top: 12px; margin-top: 8px; }
+        .summary-checkout .summary-row.total .total-price { color: #F72F9A; }
+        
+        .btn-place-order { width: 100%; padding: 14px; border: none; background: #F72F9A; color: white; border-radius: 14px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.3s; margin-top: 16px; }
+        .btn-place-order:hover { background: #d6257e; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(247,47,154,0.3); }
+        .btn-place-order:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0 12px; box-shadow: 0 -2px 20px rgba(247, 47, 154, 0.08); z-index: 200; border-top: 1px solid #FFCCEC; }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #999; font-size: 10px; font-weight: 500; padding: 2px 12px; cursor: pointer; background: none; border: none; position: relative; }
+        .bottom-nav .nav-item i { font-size: 22px; margin-bottom: 2px; transition: color 0.3s; }
+        .bottom-nav .nav-item.active { color: #F72F9A; }
+        .bottom-nav .nav-item.active i { color: #F72F9A; }
+        .bottom-nav .nav-item:hover { color: #F72F9A; }
+        .bottom-nav .nav-item .badge-cart { position: absolute; top: -2px; right: 4px; background: #F72F9A; color: white; font-size: 9px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .toast-message {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast-message.show { opacity: 1; }
+        
+        /* ===== POPUP OVERLAY ===== */
+        .payment-popup-overlay {
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding:20px;
+        }
+        .payment-popup-overlay .popup-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .payment-popup-overlay .popup-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+        }
+        .payment-popup-overlay .popup-close:hover {
+            color: #D32F2F;
+            transform: rotate(90deg);
+        }
+        
+        @media (max-width: 480px) {
+            .address-form .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-title">
+                <span class="brand-highlight">Checkout</span>
+            </div>
+            <div style="width:36px;"></div>
+        </div>
+    </header>
+
+    <!-- CHECKOUT CONTENT -->
+    <div class="checkout-container" id="checkoutContainer">
+        
+        <!-- ===== ADDRESS SECTION ===== -->
+        <div class="section-title">
+            <i class="fas fa-map-pin"></i> Alamat Pengiriman
+            <button class="btn-add-address" onclick="showAddressForm()">
+                <i class="fas fa-plus"></i> Tambah Alamat
+            </button>
+        </div>
+        
+        <!-- Address List -->
+        <div class="address-list" id="addressList">
+            <!-- Will be rendered by JS -->
+        </div>
+
+        <!-- Address Form -->
+        <div class="address-form" id="addressForm">
+            <h6 style="font-weight:700;margin-bottom:12px;" id="addressFormTitle">Tambah Alamat Baru</h6>
+            <input type="hidden" id="editAddressIndex" value="-1">
+            <div class="form-group">
+                <label>Nama Penerima</label>
+                <input type="text" id="inputName" placeholder="Masukkan nama penerima">
+            </div>
+            <div class="form-group">
+                <label>Nomor Telepon</label>
+                <input type="tel" id="inputPhone" placeholder="Masukkan nomor telepon">
+            </div>
+
+            <!-- ===== TAMBAHKAN Provinsi ===== -->
+            <div class="form-group">
+                <label>Provinsi</label>
+                <select id="inputProvince" onchange="loadCities()">
+                    <option value="">Pilih Provinsi</option>
+                </select>
+            </div>
+
+            <!-- ===== TAMBAHKAN Kota/Kabupaten ===== -->
+            <div class="form-group">
+                <label>Kota/Kabupaten</label>
+                <select id="inputCity" onchange="loadDistricts()">
+                    <option value="">Pilih Kota/Kabupaten</option>
+                </select>
+            </div>
+            
+            <!-- ===== TAMBAHKAN KECAMATAN ===== -->
+            <div class="form-group">
+                <label>Kecamatan</label>
+                <select id="inputDistrict">
+                    <option value="">Pilih Kecamatan</option>
+                </select>
+            </div>
+            
+            <!-- ===== KODE POS (tetap input manual) ===== -->
+            <div class="form-group">
+                <label>Alamat Lengkap</label>
+                <input type="text" id="inputAddress" placeholder="Masukkan alamat lengkap (jalan, RT/RW)">
+            </div>
+            <div class="form-group">
+                <label>Kode Pos</label>
+                <input type="text" id="inputPostal" placeholder="Kode pos">
+            </div>
+            <div class="form-actions">
+                <button class="btn-save-address" onclick="saveAddress()">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+                <button class="btn-cancel-address" onclick="cancelAddressForm()">Batal</button>
+            </div>
+        </div>
+
+        <!-- ===== SHIPPING OPTIONS ===== -->
+        <div class="section-title"><i class="fas fa-truck"></i> Metode Pengiriman</div>
+        <div class="shipping-options" id="shippingOptions">
+            <div class="shipping-loading">
+                <div class="spinner"></div>
+                <p>Pilih alamat terlebih dahulu untuk melihat ongkir</p>
+            </div>
+        </div>
+
+        <!-- ===== PRODUCTS ===== -->
+        <div class="section-title"><i class="fas fa-box"></i> Produk</div>
+        <div id="productsList" style="background:white;border-radius:16px;padding:12px 16px;border:1px solid #e8e8e8;margin-bottom:16px;">
+            <!-- Products will be rendered here -->
+        </div>
+
+        <!-- ===== PAYMENT METHOD ===== -->
+        <div class="section-title"><i class="fas fa-credit-card"></i> Metode Pembayaran</div>
+        <div class="payment-method">
+            <div class="method-option" onclick="document.getElementById('payment_qris').checked=true;">
+                <input type="radio" name="payment" id="payment_qris" value="qris" checked>
+                <span class="method-icon"><i class="fas fa-qrcode"></i></span>
+                <span class="method-label">QRIS</span>
+            </div>
+            <div class="method-option" onclick="document.getElementById('payment_bca').checked=true;">
+                <input type="radio" name="payment" id="payment_bca" value="bca">
+                <span class="method-icon"><i class="fas fa-university"></i></span>
+                <span class="method-label">BCA Transfer</span>
+            </div>
+            <div class="method-option" onclick="document.getElementById('payment_cod').checked=true;">
+                <input type="radio" name="payment" id="payment_cod" value="cod">
+                <span class="method-icon"><i class="fas fa-hand-holding-usd"></i></span>
+                <span class="method-label">COD (Bayar di Tempat)</span>
+            </div>
+        </div>
+
+        <!-- ===== SUMMARY ===== -->
+        <div class="section-title"><i class="fas fa-receipt"></i> Ringkasan Belanja</div>
+        <div class="summary-checkout">
+            <div class="summary-row">
+                <span>Total Harga (<span id="itemCountCheckout">0</span> item)</span>
+                <span id="subtotalCheckout">Rp 0</span>
+            </div>
+            <div class="summary-row">
+                <span>Biaya Pengiriman</span>
+                <span id="shippingCostDisplay">-</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span class="total-price" id="totalCheckout">Rp 0</span>
+            </div>
+        </div>
+
+        <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()" disabled>Buat Pesanan</button>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast-message" id="toastMessage"></div>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/'"><i class="fas fa-home"></i>Beranda</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:kategori" %}'"><i class="fas fa-th-large"></i>Kategori</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:favorit" %}'"><i class="fas fa-heart"></i>Favorit</button>
+        <button class="nav-item active" onclick="window.location.href='{% url "toko:keranjang" %}'"><i class="fas fa-shopping-bag"></i>Keranjang <span class="badge-cart" id="cartBadge">0</span></button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i>Akun</button>
+    </nav>
+
+    <script>
+        // ============================================================
+        // CONSTANTS & HELPERS
+        // ============================================================
+        const USD_TO_IDR = 16000;
+        let isProcessing = false;
+        let currentPopup = null;
+
+        function formatPrice(priceInUSD) {
+            if (!priceInUSD || priceInUSD === 0) return 'Rp 0';
+            const priceInRupiah = priceInUSD * USD_TO_IDR;
+            return `Rp${Math.round(priceInRupiah).toLocaleString('id-ID')}`;
+        }
+
+        function formatPriceIDR(priceInRupiah) {
+            if (!priceInRupiah || priceInRupiah === 0) return 'Rp 0';
+            return `Rp${Math.round(priceInRupiah).toLocaleString('id-ID')}`;
+        }
+
+        function getCSRFToken() {
+            const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            return cookie ? cookie.split('=')[1] : '';
+        }
+
+        // Override fetch untuk CSRF
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options = {}) {
+            if (options.method && options.method.toUpperCase() !== 'GET') {
+                options.headers = options.headers || {};
+                options.headers['X-CSRFToken'] = getCSRFToken();
+            }
+            return originalFetch.call(this, url, options);
+        };
+
+        // ============================================================
+        // 1. CART & CHECKOUT ITEMS
+        // ============================================================
+        function getCheckoutItems() {
+            try { return JSON.parse(localStorage.getItem('checkoutItems')) || []; } 
+            catch { return []; }
+        }
+
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+                document.querySelectorAll('#cartBadge').forEach(badge => {
+                    badge.textContent = total;
+                });
+            } catch { }
+        }
+
+        let checkoutItems = [];
+        let selectedAddressId = null;
+        let selectedShippingCost = 0;
+        let selectedShippingService = '';
+        let addresses = [];
+
+        // ============================================================
+        // 2. ADDRESS FUNCTIONS
+        // ============================================================
+        function getAddresses() {
+            try { return JSON.parse(localStorage.getItem('addresses')) || []; } 
+            catch { return []; }
+        }
+
+        function saveAddressesToStorage(addrs) {
+            localStorage.setItem('addresses', JSON.stringify(addrs));
+            addresses = addrs;
+            renderAddresses();
+        }
+
+        function getSelectedAddressId() {
+            return localStorage.getItem('selectedAddressId') || null;
+        }
+
+        function saveSelectedAddressId(id) {
+            localStorage.setItem('selectedAddressId', id);
+            selectedAddressId = id;
+            renderAddresses();
+            const addr = addresses.find(a => a.id == id);
+            if (addr && addr.city_id) {
+                calculateShipping(addr.city_id);
+            }
+        }
+
+        function loadSavedAddress() {
+            const address = getSavedAddress();
+            if (address) {
+                document.getElementById('addressLabel').textContent = `🏠 ${address.label || 'Alamat'}`;
+                document.getElementById('addressDetail').innerHTML = `
+                    ${address.address || ''}<br>
+                    ${address.district ? address.district + ', ' : ''}${address.city || ''}, ${address.province || ''}<br>
+                    ${address.phone || ''}
+                `;
+                document.getElementById('btnChangeAddress').textContent = 'Ubah';
+                
+                if (address.city_id) {
+                    selectedCityId = address.city_id;
+                    calculateShipping();
+                }
+            } else {
+                document.getElementById('addressLabel').textContent = '🏠 Belum ada alamat';
+                document.getElementById('addressDetail').textContent = 'Silakan tambahkan alamat pengiriman';
+                document.getElementById('btnChangeAddress').textContent = 'Tambah';
+            }
+        }
+
+        function getSavedAddress() {
+            try { return JSON.parse(localStorage.getItem('selectedAddress')) || null; } 
+            catch { return null; }
+        }
+
+        function renderAddresses() {
+            const container = document.getElementById('addressList');
+            addresses = getAddresses();
+            const selectedId = getSelectedAddressId();
+
+            if (addresses.length === 0) {
+                container.innerHTML = `
+                    <div class="no-address">
+                        <i class="fas fa-home"></i>
+                        <p>Belum ada alamat tersimpan</p>
+                        <button class="btn-add-address" onclick="showAddressForm()" style="margin-top:8px;padding:6px 20px;background:#F72F9A;color:white;border:none;border-radius:20px;cursor:pointer;">
+                            <i class="fas fa-plus"></i> Tambah Alamat
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            addresses.forEach((addr, index) => {
+                const isSelected = addr.id == selectedId;
+                html += `
+                    <div class="address-card ${isSelected ? 'selected' : ''}" onclick="selectAddress(${addr.id})">
+                        <input type="radio" name="selectedAddress" ${isSelected ? 'checked' : ''} onchange="selectAddress(${addr.id})">
+                        <div class="address-content">
+                            <div class="address-label">${addr.label || 'Alamat'}</div>
+                            <div class="address-detail">
+                                ${addr.address || ''}<br>
+                                ${addr.district ? addr.district + ', ' : ''}${addr.city || ''}, ${addr.province || ''}<br>
+                                ${addr.phone || ''}
+                            </div>
+                            <div class="address-actions">
+                                <button class="btn-edit" onclick="event.stopPropagation(); editAddress(${index})">
+                                    <i class="fas fa-edit"></i> Ubah
+                                </button>
+                                <button class="btn-delete" onclick="event.stopPropagation(); deleteAddress(${index})">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            if (!selectedId && addresses.length > 0) {
+                saveSelectedAddressId(addresses[0].id);
+            }
+        }
+
+        function selectAddress(id) {
+            saveSelectedAddressId(id);
+            showToast('✅ Alamat dipilih');
+        }
+
+        function deleteAddress(index) {
+            if (!confirm('Yakin ingin menghapus alamat ini?')) return;
+            addresses.splice(index, 1);
+            saveAddressesToStorage(addresses);
+            if (addresses.length > 0) {
+                saveSelectedAddressId(addresses[0].id);
+            } else {
+                localStorage.removeItem('selectedAddressId');
+                selectedAddressId = null;
+                renderAddresses();
+                document.getElementById('shippingOptions').innerHTML = `
+                    <div class="shipping-loading">
+                        <p>Pilih alamat terlebih dahulu untuk melihat ongkir</p>
+                    </div>
+                `;
+                selectedShippingCost = 0;
+                updateSummary(getSubtotalInIDR());
+            }
+            showToast('🗑️ Alamat dihapus');
+        }
+
+        // ============================================================
+        // 3. ADDRESS FORM
+        // ============================================================
+        function showAddressForm(editIndex) {
+            const form = document.getElementById('addressForm');
+            form.classList.add('show');
+            
+            if (editIndex !== undefined && editIndex >= 0) {
+                document.getElementById('addressFormTitle').textContent = 'Ubah Alamat';
+                document.getElementById('editAddressIndex').value = editIndex;
+                const addr = addresses[editIndex];
+                if (addr) {
+                    document.getElementById('inputName').value = addr.name || '';
+                    document.getElementById('inputPhone').value = addr.phone || '';
+                    document.getElementById('inputAddress').value = addr.address || '';
+                    document.getElementById('inputPostal').value = addr.postal || '';
+                    
+                    // Load provinsi, kota, dan kecamatan
+                    loadProvinces().then(() => {
+                        if (addr.province_id) {
+                            document.getElementById('inputProvince').value = addr.province_id;
+                            loadCities().then(() => {
+                                if (addr.city_id) {
+                                    document.getElementById('inputCity').value = addr.city_id;
+                                    // ===== LOAD KECAMATAN =====
+                                    loadDistricts().then(() => {
+                                        if (addr.district_id) {
+                                            document.getElementById('inputDistrict').value = addr.district_id;
+                                        } else if (addr.district) {
+                                            // Fallback: cari berdasarkan nama
+                                            const options = document.getElementById('inputDistrict').options;
+                                            for (let i = 0; i < options.length; i++) {
+                                                if (options[i].text === addr.district) {
+                                                    options[i].selected = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            } else {
+                document.getElementById('addressFormTitle').textContent = 'Tambah Alamat Baru';
+                document.getElementById('editAddressIndex').value = '-1';
+                document.getElementById('inputName').value = '';
+                document.getElementById('inputPhone').value = '';
+                document.getElementById('inputAddress').value = '';
+                document.getElementById('inputPostal').value = '';
+                document.getElementById('inputProvince').innerHTML = '<option value="">Pilih Provinsi</option>';
+                document.getElementById('inputCity').innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                document.getElementById('inputDistrict').innerHTML = '<option value="">Pilih Kecamatan</option>';
+                loadProvinces();
+            }
+            
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function cancelAddressForm() {
+            document.getElementById('addressForm').classList.remove('show');
+            document.getElementById('editAddressIndex').value = '-1';
+        }
+
+        function saveAddress() {
+            const name = document.getElementById('inputName').value.trim();
+            const phone = document.getElementById('inputPhone').value.trim();
+            const province = document.getElementById('inputProvince');
+            const city = document.getElementById('inputCity');
+            const district = document.getElementById('inputDistrict');
+            const address = document.getElementById('inputAddress').value.trim();
+            const postal = document.getElementById('inputPostal').value.trim();
+            const editIndex = parseInt(document.getElementById('editAddressIndex').value);
+
+            if (!name || !phone || !province.value || !city.value || !district.value || !address) {
+                showToast('⚠️ Semua field harus diisi!');
+                return;
+            }
+
+            const newAddress = {
+                id: Date.now(),
+                label: name,
+                name: name,
+                phone: phone,
+                province: province.options[province.selectedIndex].text,
+                province_id: province.value,
+                city: city.options[city.selectedIndex].text,
+                city_id: city.value,
+                district: district.options[district.selectedIndex].text,
+                district_id: district.value,
+                address: address,
+                postal: postal
+            };
+
+            let addrs = getAddresses();
+            if (editIndex >= 0 && editIndex < addrs.length) {
+                newAddress.id = addrs[editIndex].id;
+                addrs[editIndex] = newAddress;
+                showToast('✅ Alamat berhasil diupdate!');
+            } else {
+                addrs.push(newAddress);
+                showToast('✅ Alamat berhasil ditambahkan!');
+            }
+
+            saveAddressesToStorage(addrs);
+            
+            if (editIndex < 0) {
+                saveSelectedAddressId(newAddress.id);
+            } else {
+                renderAddresses();
+            }
+            
+            cancelAddressForm();
+        }
+
+        function editAddress(index) {
+            showAddressForm(index);
+        }
+
+        // ============================================================
+        // 4. PROVINCE & CITY (EMSIFA API)
+        // ============================================================
+        async function loadProvinces() {
+            try {
+                const response = await fetch('/api/provinces/');
+                const data = await response.json();
+                const select = document.getElementById('inputProvince');
+                select.innerHTML = '<option value="">Pilih Provinsi</option>';
+                
+                if (data.rajaongkir && data.rajaongkir.results) {
+                    data.rajaongkir.results.forEach(prov => {
+                        const option = document.createElement('option');
+                        option.value = prov.province_id;
+                        option.textContent = prov.province;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading provinces:', error);
+                showToast('⚠️ Gagal memuat provinsi');
+            }
+        }
+
+        async function loadCities() {
+            const provinceId = document.getElementById('inputProvince').value;
+            if (!provinceId) {
+                document.getElementById('inputCity').innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cities/${provinceId}/`);
+                const data = await response.json();
+                const select = document.getElementById('inputCity');
+                select.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                
+                if (data.rajaongkir && data.rajaongkir.results) {
+                    data.rajaongkir.results.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.city_id;
+                        option.textContent = city.city_name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading cities:', error);
+                showToast('⚠️ Gagal memuat kota');
+            }
+        }
+
+        // ============================================================
+        // 5. LOAD DISTRICTS (KECAMATAN)
+        // ============================================================
+        async function loadDistricts() {
+            const cityId = document.getElementById('inputCity').value;
+            if (!cityId) {
+                document.getElementById('inputDistrict').innerHTML = '<option value="">Pilih Kecamatan</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/districts/${cityId}/`);
+                const data = await response.json();
+                const select = document.getElementById('inputDistrict');
+                select.innerHTML = '<option value="">Pilih Kecamatan</option>';
+                
+                if (data.rajaongkir && data.rajaongkir.results) {
+                    data.rajaongkir.results.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.district_id;
+                        option.textContent = district.district_name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading districts:', error);
+                showToast('⚠️ Gagal memuat kecamatan');
+            }
+        }
+
+        // ============================================================
+        // 6. SHIPPING COST (RajaOngkir API)
+        // ============================================================
+        async function calculateShipping(cityId) {
+            if (!cityId) {
+                document.getElementById('shippingOptions').innerHTML = `
+                    <div class="shipping-loading">
+                        <p>Pilih alamat terlebih dahulu untuk melihat ongkir</p>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('shippingOptions').innerHTML = `
+                <div class="shipping-loading">
+                    <div class="spinner"></div>
+                    <p>Menghitung ongkir...</p>
+                </div>
+            `;
+
+            try {
+                const totalWeight = checkoutItems.reduce((sum, item) => sum + (item.quantity * 200), 200);
+                
+                const response = await fetch('/api/shipping-cost/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: JSON.stringify({
+                        destination: cityId,
+                        weight: Math.max(totalWeight, 200),
+                        courier: 'jne'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.rajaongkir && data.rajaongkir.results && data.rajaongkir.results.length > 0) {
+                    const costs = data.rajaongkir.results[0].costs || [];
+                    
+                    if (costs.length === 0) {
+                        document.getElementById('shippingOptions').innerHTML = `
+                            <div class="shipping-loading">
+                                <p>⚠️ Tidak ada layanan pengiriman untuk tujuan ini</p>
+                            </div>
+                        `;
+                        selectedShippingCost = 0;
+                        updateSummary(getSubtotalInIDR());
+                        return;
+                    }
+
+                    let html = '';
+                    costs.forEach((cost, index) => {
+                        const price = cost.cost && cost.cost.length > 0 ? cost.cost[0].value : 0;
+                        const etd = cost.cost && cost.cost.length > 0 ? cost.cost[0].etd : '-';
+                        const checked = index === 0 ? 'checked' : '';
+                        if (index === 0) {
+                            selectedShippingCost = price;
+                            selectedShippingService = cost.service || 'REG';
+                        }
+                        
+                        html += `
+                            <div class="shipping-option" onclick="document.getElementById('shipping_${index}').checked=true; selectShipping(${index}, ${price}, '${cost.service}')">
+                                <input type="radio" name="shipping" id="shipping_${index}" value="${cost.service}" ${checked} onchange="selectShipping(${index}, ${price}, '${cost.service}')">
+                                <span class="shipping-label">
+                                    <strong>${cost.service}</strong> - ${cost.description || ''} (${etd} hari)
+                                </span>
+                                <span class="shipping-price">Rp${price.toLocaleString('id-ID')}</span>
+                            </div>
+                        `;
+                    });
+
+                    document.getElementById('shippingOptions').innerHTML = html;
+                    updateSummary(getSubtotalInIDR());
+                } else {
+                    document.getElementById('shippingOptions').innerHTML = `
+                        <div class="shipping-loading">
+                            <p>⚠️ Gagal menghitung ongkir</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error calculating shipping:', error);
+                document.getElementById('shippingOptions').innerHTML = `
+                    <div class="shipping-loading">
+                        <p>⚠️ Gagal terhubung ke server</p>
+                    </div>
+                `;
+            }
+        }
+
+        function selectShipping(index, price, service) {
+            selectedShippingCost = price;
+            selectedShippingService = service;
+            updateSummary(getSubtotalInIDR());
+        }
+
+        function getSubtotalInIDR() {
+            let subtotal = 0;
+            checkoutItems.forEach(item => {
+                let priceInRupiah;
+                if (item.price < 1000) {
+                    priceInRupiah = item.price * USD_TO_IDR;
+                } else {
+                    priceInRupiah = item.price;
+                }
+                subtotal += priceInRupiah * item.quantity;
+            });
+            return subtotal;
+        }
+
+        // ============================================================
+        // 7. RENDER PRODUCTS
+        // ============================================================
+        function renderProducts() {
+            const items = getCheckoutItems();
+            const container = document.getElementById('productsList');
+            checkoutItems = items;
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:20px;color:#888;">
+                        <i class="fas fa-shopping-bag" style="font-size:24px;color:#ddd;display:block;margin-bottom:8px;"></i>
+                        <p>Tidak ada produk untuk checkout</p>
+                        <button onclick="window.location.href='{% url "toko:kategori" %}'" style="margin-top:8px;padding:8px 20px;border:none;background:#F72F9A;color:white;border-radius:8px;cursor:pointer;">Belanja Sekarang</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            items.forEach(item => {
+                let priceInRupiah;
+                if (item.price < 1000) {
+                    priceInRupiah = item.price * USD_TO_IDR;
+                } else {
+                    priceInRupiah = item.price;
+                }
+                
+                html += `
+                    <div class="product-item-checkout">
+                        <div class="item-image">
+                            <img src="${item.image || 'https://via.placeholder.com/50x50?text=No+Image'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50x50?text=No+Image'">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name">${item.name || 'Produk'}</div>
+                            <div class="item-brand">${item.brand || 'Maybelline'}</div>
+                            <div class="item-price">${formatPriceIDR(priceInRupiah)}</div>
+                        </div>
+                        <div class="item-qty">x${item.quantity}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            updateSummary(getSubtotalInIDR());
+        }
+
+        // ============================================================
+        // 8. SUMMARY
+        // ============================================================
+        function updateSummary(subtotalInIDR) {
+            const shipping = selectedShippingCost || 0;
+            const total = subtotalInIDR + shipping;
+
+            document.getElementById('itemCountCheckout').textContent = checkoutItems.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('subtotalCheckout').textContent = formatPriceIDR(subtotalInIDR);
+            document.getElementById('shippingCostDisplay').textContent = shipping > 0 ? formatPriceIDR(shipping) : '-';
+            document.getElementById('totalCheckout').textContent = formatPriceIDR(total);
+
+            const orderBtn = document.getElementById('placeOrderBtn');
+            if (selectedAddressId && selectedShippingCost > 0 && checkoutItems.length > 0) {
+                orderBtn.disabled = false;
+            } else {
+                orderBtn.disabled = true;
+            }
+        }
+
+        // ============================================================
+        // 9. PLACE ORDER WITH DATABASE SAVE (PERBAIKAN)
+        // ============================================================
+        async function placeOrder() {
+            if (isProcessing) return;
+            
+            if (checkoutItems.length === 0) {
+                showToast('⚠️ Tidak ada produk untuk dipesan.');
+                return;
+            }
+
+            if (!selectedAddressId || selectedShippingCost <= 0) {
+                showToast('⚠️ Silakan pilih alamat dan metode pengiriman.');
+                return;
+            }
+
+            isProcessing = true;
+            const orderBtn = document.getElementById('placeOrderBtn');
+            orderBtn.disabled = true;
+            orderBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+
+            try {
+                const paymentMethod = document.querySelector('input[name="payment"]:checked');
+                const method = paymentMethod ? paymentMethod.value : 'qris';
+                const selectedAddr = addresses.find(a => a.id == selectedAddressId);
+                
+                const totalAmount = Math.round(getSubtotalInIDR() + selectedShippingCost);
+
+                // ===== Data pesanan untuk dikirim ke server =====
+                const orderData = {
+                    items: checkoutItems.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        brand: item.brand || 'Maybelline',
+                        price: item.price < 1000 ? item.price * USD_TO_IDR : item.price,
+                        quantity: item.quantity,
+                        image: item.image || ''
+                    })),
+                    total: totalAmount,
+                    shipping_cost: selectedShippingCost,
+                    shipping_service: selectedShippingService,
+                    payment_method: method,
+                    address: {
+                        alamat: selectedAddr?.address || '',
+                        kota: selectedAddr?.city || '',
+                        provinsi: selectedAddr?.province || '',
+                        kecamatan: selectedAddr?.district || '',
+                        kode_pos: selectedAddr?.postal || '',
+                        nama_penerima: selectedAddr?.name || '',
+                        telepon: selectedAddr?.phone || ''
+                    },
+                    status: 'menunggu'
+                };
+
+                // ===== SAVE TO DATABASE via API =====
+                const saveResponse = await fetch('/api/save-order/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const saveResult = await saveResponse.json();
+
+                if (!saveResult.success) {
+                    showToast('❌ Gagal menyimpan pesanan: ' + (saveResult.error || 'Unknown error'));
+                    isProcessing = false;
+                    orderBtn.disabled = false;
+                    orderBtn.textContent = 'Buat Pesanan';
+                    return;
+                }
+
+                // ===== Simpan ke localStorage untuk sementara =====
+                const orderId = saveResult.order_id;
+                const orderHistory = {
+                    order_id: orderId,
+                    date: new Date().toISOString(),
+                    items: checkoutItems,
+                    total: totalAmount,
+                    status: 'menunggu',
+                    payment_method: method,
+                    shipping_service: selectedShippingService,
+                    address: selectedAddr
+                };
+
+                const orders = JSON.parse(localStorage.getItem('orders')) || [];
+                orders.push(orderHistory);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                localStorage.removeItem('checkoutItems');
+                localStorage.setItem('lastOrder', JSON.stringify(orderHistory));
+
+                // ===== COD =====
+                if (method === 'cod') {
+                    showToast('✅ Pesanan berhasil dibuat!');
+                    isProcessing = false;
+                    orderBtn.disabled = false;
+                    orderBtn.textContent = 'Buat Pesanan';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/pesanan-berhasil/';
+                    }, 500);
+                    return;
+                }
+
+                // ===== QRIS & BCA Transfer =====
+                const response = await fetch('/api/create-xendit-payment/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: JSON.stringify({
+                        payment_method: method,
+                        amount: totalAmount,
+                        customer_name: selectedAddr?.name || 'Customer',
+                        customer_email: '{{ user.email }}',
+                        customer_phone: selectedAddr?.phone || '',
+                        bank_code: 'BCA',
+                        order_id: orderId
+                    })
+                });
+
+                const result = await response.json();
+                isProcessing = false;
+                orderBtn.disabled = false;
+                orderBtn.textContent = 'Buat Pesanan';
+
+                if (result.success) {
+                    if (method === 'qris') {
+                        showQRISPayment(result, totalAmount, orderHistory);
+                    } else if (method === 'bca' || method === 'va') {
+                        showVAPayment(result, totalAmount, orderHistory);
+                    } else {
+                        setTimeout(() => {
+                            window.location.href = '/pesanan-berhasil/';
+                        }, 500);
+                    }
+                } else {
+                    showToast('❌ Gagal: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                showToast('❌ Gagal memproses pembayaran: ' + error.message);
+                isProcessing = false;
+                orderBtn.disabled = false;
+                orderBtn.textContent = 'Buat Pesanan';
+            }
+        }
+
+        // ============================================================
+        // POPUP FUNCTIONS
+        // ============================================================
+        function closePaymentPopup() {
+            if (currentPopup) {
+                currentPopup.remove();
+                currentPopup = null;
+            }
+        }
+
+        function showPaymentPopup(htmlContent) {
+            closePaymentPopup();
+            const popup = document.createElement('div');
+            popup.className = 'payment-popup-overlay';
+            popup.innerHTML = htmlContent;
+            document.body.appendChild(popup);
+            currentPopup = popup;
+        }
+
+        // ===== SHOW QRIS PAYMENT =====
+        function showQRISPayment(data, totalAmount, orderData) {
+            const result = data.result || {};
+            const orderId = data.order_id || orderData?.order_id || 'N/A';
+            const amount = totalAmount || data.amount || getSubtotalInIDR() + selectedShippingCost;
+            
+            const qrString = result.qr_string || result.qr_code || result.id || '';
+            let qrCodeUrl = '';
+            if (qrString) {
+                const encodedData = encodeURIComponent(qrString);
+                qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodedData}`;
+            } else {
+                const fallbackData = `QRIS-${orderId}`;
+                qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(fallbackData)}`;
+            }
+            
+            const htmlContent = `
+                <div class="popup-content">
+                    <button class="popup-close" onclick="closePaymentPopup()">✕</button>
+                    
+                    <div style="margin-bottom:16px;">
+                        <i class="fas fa-qrcode" style="font-size:48px;color:#F72F9A;"></i>
+                        <h5 style="font-weight:700;margin-top:8px;">QRIS Payment</h5>
+                    </div>
+                    
+                    <div style="background:#f5f5f5;border-radius:12px;padding:12px;margin-bottom:12px;">
+                        <p style="font-size:12px;color:#888;margin-bottom:2px;">Order ID</p>
+                        <p style="font-weight:600;font-size:14px;color:#1a1a1a;">${orderId}</p>
+                    </div>
+                    
+                    <div style="background:#f8f8f8;border-radius:12px;padding:20px;margin-bottom:12px;min-height:220px;display:flex;align-items:center;justify-content:center;">
+                        <img src="${qrCodeUrl}" alt="QR Code" style="max-width:220px;margin:0 auto;display:block;" 
+                            onerror="console.error('QR Code load failed'); this.style.display='none'; this.parentElement.innerHTML='<div style=\\'padding:20px;background:white;border-radius:8px;border:2px solid #F72F9A;width:100%;text-align:center;\\'><p style=\\'font-size:14px;color:#333;font-weight:600;\\'>QR Code</p><p style=\\'font-size:12px;color:#888;word-break:break-all;\\'>${qrString || 'QRIS-' + orderId}</p><p style=\\'font-size:11px;color:#999;margin-top:8px;\\'>Scan dengan aplikasi e-wallet</p></div>'">
+                    </div>
+                    
+                    <div style="background:#f5f5f5;border-radius:12px;padding:12px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="color:#888;font-size:13px;">Total Pembayaran</span>
+                            <span style="font-weight:700;color:#F72F9A;font-size:16px;">${formatPriceIDR(amount)}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid #eee;">
+                            <span style="color:#888;font-size:13px;">Metode</span>
+                            <span style="font-weight:600;font-size:14px;">QRIS</span>
+                        </div>
+                    </div>
+                    
+                    <p style="font-size:12px;color:#888;margin-bottom:12px;">Scan QR code di atas menggunakan aplikasi e-wallet Anda</p>
+                    
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+                        <button onclick="closePaymentPopupAndRedirect('${orderId}')" style="flex:1;min-width:100px;padding:12px 20px;border:none;background:#F72F9A;color:white;border-radius:12px;font-weight:600;cursor:pointer;">
+                            <i class="fas fa-check"></i> Saya Sudah Bayar
+                        </button>
+                        <button onclick="closePaymentPopup()" style="flex:1;min-width:100px;padding:12px 20px;border:2px solid #e8e8e8;background:white;color:#666;border-radius:12px;font-weight:600;cursor:pointer;">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            `;
+            showPaymentPopup(htmlContent);
+        }
+
+        // ===== SHOW VA PAYMENT =====
+        function showVAPayment(data, totalAmount, orderData) {
+            const result = data.result || {};
+            const orderId = data.order_id || orderData?.order_id || 'N/A';
+            const amount = totalAmount || data.amount || getSubtotalInIDR() + selectedShippingCost;
+            
+            let vaNumber = 'N/A';
+            let bank = 'BCA';
+            
+            if (result.va_numbers && result.va_numbers.length > 0) {
+                vaNumber = result.va_numbers[0].va_number || 'N/A';
+                bank = result.va_numbers[0].bank || 'BCA';
+            } else if (result.va_number) {
+                vaNumber = result.va_number;
+            } else if (result.account_number) {
+                vaNumber = result.account_number;
+            }
+            
+            if (vaNumber === 'N/A' && orderId !== 'N/A') {
+                vaNumber = orderId.replace('ORDER-', '');
+            }
+            
+            const htmlContent = `
+                <div class="popup-content">
+                    <button class="popup-close" onclick="closePaymentPopup()">✕</button>
+                    
+                    <i class="fas fa-university" style="font-size:48px;color:#F72F9A;margin-bottom:16px;"></i>
+                    <h5 style="font-weight:700;">Transfer Virtual Account</h5>
+                    
+                    <div style="background:#f5f5f5;border-radius:12px;padding:12px;margin:12px 0;">
+                        <p style="font-size:12px;color:#888;margin-bottom:2px;">Order ID</p>
+                        <p style="font-weight:600;font-size:14px;color:#1a1a1a;">${orderId}</p>
+                    </div>
+                    
+                    <div style="background:#f8f8f8;border-radius:12px;padding:16px;margin:12px 0;border:2px solid #F72F9A;">
+                        <p style="font-size:12px;color:#888;margin-bottom:4px;">Bank: <strong>${bank}</strong></p>
+                        <p style="font-size:12px;color:#888;margin-bottom:4px;">Nomor Virtual Account</p>
+                        <p style="font-size:24px;font-weight:700;color:#1a1a1a;letter-spacing:2px;">${vaNumber}</p>
+                    </div>
+                    
+                    <div style="background:#f5f5f5;border-radius:12px;padding:12px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="color:#888;font-size:13px;">Total Pembayaran</span>
+                            <span style="font-weight:700;color:#F72F9A;font-size:16px;">${formatPriceIDR(amount)}</span>
+                        </div>
+                    </div>
+                    
+                    <p style="font-size:12px;color:#888;margin-bottom:12px;">Transfer ke nomor VA di atas melalui ATM/Mobile Banking</p>
+                    
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+                        <button onclick="closePaymentPopupAndRedirect('${orderId}')" style="flex:1;min-width:100px;padding:12px 20px;border:none;background:#F72F9A;color:white;border-radius:12px;font-weight:600;cursor:pointer;">
+                            <i class="fas fa-check"></i> Saya Sudah Bayar
+                        </button>
+                        <button onclick="closePaymentPopup()" style="flex:1;min-width:100px;padding:12px 20px;border:2px solid #e8e8e8;background:white;color:#666;border-radius:12px;font-weight:600;cursor:pointer;">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            `;
+            showPaymentPopup(htmlContent);
+        }
+
+        // ===== CLOSE POPUP AND REDIRECT =====
+        function closePaymentPopupAndRedirect(orderId) {
+            closePaymentPopup();
+            
+            const orderBtn = document.getElementById('placeOrderBtn');
+            if (orderBtn) {
+                orderBtn.disabled = false;
+                orderBtn.textContent = 'Buat Pesanan';
+            }
+            isProcessing = false;
+            
+            showToast('✅ Pembayaran berhasil! Terima kasih.');
+            setTimeout(() => {
+                window.location.href = '/pesanan-berhasil/';
+            }, 500);
+        }
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(message) {
+            const toast = document.getElementById('toastMessage');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        function init() {
+            updateCartBadge();
+            renderProducts();
+            renderAddresses();
+            loadSavedAddress();
+            
+            const selectedId = getSelectedAddressId();
+            if (selectedId) {
+                const addr = addresses.find(a => a.id == selectedId);
+                if (addr && addr.city_id) {
+                    calculateShipping(addr.city_id);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

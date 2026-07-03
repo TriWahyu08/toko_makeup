@@ -1,0 +1,158 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirim Notifikasi - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f0f0; }
+        .admin-header { background: linear-gradient(135deg, #1a1a1a, #2a2a2a); padding: 16px 24px; color: white; position: sticky; top: 0; z-index: 100; }
+        .admin-header .brand { font-size: 20px; font-weight: 800; }
+        .admin-header .brand span { color: #F72F9A; }
+        .admin-sidebar { position: fixed; top: 70px; left: 0; width: 220px; height: calc(100vh - 70px); background: white; box-shadow: 2px 0 20px rgba(0,0,0,0.06); padding: 20px 0; overflow-y: auto; z-index: 99; }
+        .admin-sidebar .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #666; text-decoration: none; transition: all 0.3s; border-left: 3px solid transparent; }
+        .admin-sidebar .nav-item:hover { background: #FFF5F8; color: #F72F9A; }
+        .admin-sidebar .nav-item.active { background: #FFF5F8; color: #F72F9A; border-left-color: #F72F9A; }
+        .admin-content { margin-left: 220px; padding: 24px; }
+        .toast-message { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 12px; z-index: 999; opacity: 0; transition: opacity 0.3s; }
+        .toast-message.show { opacity: 1; }
+        @media (max-width: 768px) { .admin-sidebar { width: 60px; } .admin-sidebar .nav-item span { display: none; } .admin-content { margin-left: 60px; padding: 16px; } }
+        .form-control:focus { border-color: #F72F9A; box-shadow: 0 0 0 3px rgba(247,47,154,0.1); }
+        .btn-pink { background: #F72F9A; color: white; }
+        .btn-pink:hover { background: #d6257e; color: white; }
+    </style>
+</head>
+<body>
+
+    <header class="admin-header">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="brand">May<span>Bellien</span> Admin</div>
+            <div>
+                <a href="{% url 'toko:logout' %}" class="btn btn-sm btn-outline-light">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="admin-sidebar">
+        <a href="{% url 'toko:admin_dashboard' %}" class="nav-item"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
+        <a href="{% url 'toko:admin_orders' %}" class="nav-item"><i class="fas fa-shopping-bag"></i><span>Pesanan</span></a>
+        <a href="{% url 'toko:admin_users' %}" class="nav-item"><i class="fas fa-users"></i><span>User</span></a>
+        <a href="{% url 'toko:admin_products' %}" class="nav-item"><i class="fas fa-box"></i><span>Produk</span></a>
+        <a href="{% url 'toko:admin_notifications' %}" class="nav-item active"><i class="fas fa-bell"></i><span>Notifikasi</span></a>
+    </nav>
+
+    <div class="admin-content">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="fw-bold mb-0"><i class="fas fa-bell me-2" style="color:#F72F9A;"></i>Kirim Notifikasi Massal</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="fw-semibold mb-1">Judul Notifikasi</label>
+                            <input type="text" class="form-control" id="notifTitle" placeholder="Contoh: Promo Spesial Akhir Tahun!">
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-semibold mb-1">Pesan Notifikasi</label>
+                            <textarea class="form-control" id="notifMessage" rows="4" placeholder="Tulis pesan notifikasi..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-semibold mb-1">Dikirim ke</label>
+                            <select class="form-select" id="notifUserType">
+                                <option value="all">Semua User</option>
+                                <option value="user">User Biasa</option>
+                                <option value="admin">Admin & Staff</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-pink w-100 py-3 fw-bold" onclick="sendNotification()">
+                            <i class="fas fa-paper-plane me-2"></i>Kirim Notifikasi
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="fw-bold mb-0"><i class="fas fa-history me-2" style="color:#F72F9A;"></i>Notifikasi Terkirim</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-bell-slash" style="font-size:32px;color:#ddd;"></i>
+                            <p class="mt-2">Belum ada notifikasi terkirim</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-message" id="toastMessage"></div>
+
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById('toastMessage');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function getCSRFToken() {
+            const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            return cookie ? cookie.split('=')[1] : '';
+        }
+
+        async function sendNotification() {
+            const title = document.getElementById('notifTitle').value.trim();
+            const message = document.getElementById('notifMessage').value.trim();
+            const userType = document.getElementById('notifUserType').value;
+
+            if (!title || !message) {
+                showToast('⚠️ Judul dan pesan harus diisi!');
+                return;
+            }
+
+            if (!confirm(`Kirim notifikasi "${title}" ke ${userType}?`)) return;
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengirim...';
+
+            try {
+                const response = await fetch('/api/admin/send-notification/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        message: message,
+                        user_type: userType
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(`✅ Notifikasi berhasil dikirim ke ${data.sent_to} user!`);
+                    document.getElementById('notifTitle').value = '';
+                    document.getElementById('notifMessage').value = '';
+                } else {
+                    showToast('❌ Gagal: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ Gagal terhubung ke server');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Kirim Notifikasi';
+        }
+    </script>
+</body>
+</html>

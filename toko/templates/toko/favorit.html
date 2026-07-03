@@ -1,0 +1,254 @@
+<!-- toko/templates/toko/favorit.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorit - MyBelin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #FFF3FB; padding-bottom: 80px; color: #1a1a1a; }
+        
+        .header { background: white; padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(247, 47, 154, 0.08); }
+        .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .header-title { font-size: 20px; font-weight: 800; color: #1a1a1a; text-align: center; flex: 1; }
+        .header-title .brand-highlight { color: #F72F9A; }
+        .header-title small { font-size: 11px; font-weight: 400; color: #888; letter-spacing: 1px; display: block; margin-top: -2px; }
+        .header .back-btn { background: none; border: none; font-size: 20px; color: #1a1a1a; cursor: pointer; padding: 4px; }
+        .header .back-btn:hover { color: #F72F9A; }
+        
+        .product-grid { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 16px 20px 10px; max-width: 500px; margin: 0 auto; }
+        
+        .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; transition: all 0.3s; cursor: pointer; position: relative; display: flex; align-items: center; gap: 12px; padding: 12px; }
+        .product-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.10); border-color: #F72F9A; }
+        .product-card .product-image { width: 80px; height: 80px; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+        .product-card .product-image img { width: 100%; height: 100%; object-fit: contain; max-height: 70px; }
+        .product-card .product-info { flex: 1; padding: 0 4px; }
+        .product-card .product-name { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-card .product-brand { font-size: 12px; color: #999; }
+        .product-card .product-price { font-size: 14px; font-weight: 700; color: #F72F9A; margin-top: 4px; }
+        .product-card .love-btn { background: none; border: none; font-size: 24px; color: #F72F9A; cursor: pointer; transition: all 0.3s; padding: 8px; flex-shrink: 0; }
+        .product-card .love-btn:hover { transform: scale(1.2); color: #d6257e; }
+        
+        .empty-state { text-align: center; padding: 80px 20px; color: #888; grid-column: 1/-1; }
+        .empty-state i { font-size: 48px; color: #FFCCEC; margin-bottom: 16px; }
+        .empty-state h5 { color: #1a1a1a; font-weight: 600; }
+        .empty-state .btn-jelajahi { margin-top: 16px; padding: 10px 30px; border: none; background: #F72F9A; color: white; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .empty-state .btn-jelajahi:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(247,47,154,0.3); }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0 12px; box-shadow: 0 -2px 20px rgba(247, 47, 154, 0.08); z-index: 200; border-top: 1px solid #FFCCEC; }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #999; font-size: 10px; font-weight: 500; padding: 2px 12px; cursor: pointer; background: none; border: none; position: relative;}
+        .bottom-nav .nav-item i { font-size: 22px; margin-bottom: 2px; transition: color 0.3s; }
+        .bottom-nav .nav-item.active { color: #F72F9A; }
+        .bottom-nav .nav-item.active i { color: #F72F9A; }
+        .bottom-nav .nav-item:hover { color: #F72F9A; }
+        .bottom-nav .nav-item .badge-cart { position: absolute; top: -2px; right: 4px; background: #F72F9A; color: white; font-size: 9px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;  }
+        
+        .loading-state { text-align: center; padding: 60px 20px; color: #888; grid-column: 1/-1; }
+        .loading-state .spinner { width: 40px; height: 40px; border: 4px solid #FFCCEC; border-top-color: #F72F9A; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (min-width: 600px) { .product-grid { padding: 16px 30px 10px; } }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.location.href='/'"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-title">
+                <span class="brand-highlight">Favorit</span>
+                <small>MayBelline</small>
+            </div>
+            <div style="width:36px;"></div>
+        </div>
+    </header>
+
+    <!-- PRODUCT GRID -->
+    <div class="product-grid" id="productGrid">
+        <div class="loading-state"><div class="spinner"></div><p>Memuat favorit...</p></div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/'"><i class="fas fa-home"></i>Beranda</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:kategori" %}'"><i class="fas fa-th-large"></i>Kategori</button>
+        <button class="nav-item active" onclick="window.location.href='{% url "toko:favorit" %}'"><i class="fas fa-heart"></i>Favorit</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:keranjang" %}'"><i class="fas fa-shopping-bag"></i>Keranjang <span class="badge-cart" id="cartBadge">0</span></button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:pesanan_saya" %}'"><i class="fas fa-receipt"></i>Pesanan</button>
+        <button class="nav-item" onclick="window.location.href='{% url "toko:akun" %}'"><i class="fas fa-user"></i>Akun</button>
+    </nav>
+
+    <script>
+        // ===== FAVORITE FUNCTIONS =====
+        function getFavorites() { 
+            try { 
+                const favs = JSON.parse(localStorage.getItem('favorites')) || []; 
+                console.log('📦 Favorit dari localStorage:', favs);
+                return favs;
+            } catch { 
+                return []; 
+            }
+        }
+        
+        function saveFavorites(favorites) { 
+            localStorage.setItem('favorites', JSON.stringify(favorites)); 
+            console.log('💾 Favorit disimpan:', favorites);
+        }
+        
+        function toggleFavorite(productId) {
+            let favorites = getFavorites();
+            const index = favorites.indexOf(productId);
+            if (index > -1) { 
+                favorites.splice(index, 1); 
+                console.log('🗑️ Dihapus dari favorit:', productId);
+            } else { 
+                favorites.push(productId); 
+                console.log('❤️ Ditambahkan ke favorit:', productId);
+            }
+            saveFavorites(favorites);
+            renderFavorites();
+            return favorites;
+        }
+
+        let allProducts = [];
+        const productGrid = document.getElementById('productGrid');
+
+        // ===== FETCH PRODUCTS =====
+        async function fetchProducts() {
+            try {
+                // PAKAI HTTPS!
+                const response = await fetch('https://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Data produk dari API:', data.length, 'produk');
+                allProducts = data;
+                renderFavorites();
+                
+            } catch (error) {
+                console.error('❌ Error fetching products:', error);
+                productGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle" style="font-size:32px;color:#F72F9A;display:block;margin-bottom:12px;"></i>
+                        <p>Gagal memuat data: ${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top:12px;padding:8px 24px;border:none;background:#F72F9A;color:white;border-radius:8px;cursor:pointer;">Muat Ulang</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderFavorites() {
+            const favorites = getFavorites();
+            console.log('🔍 Mencari produk favorit:', favorites);
+            
+            if (favorites.length === 0) {
+                productGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <i class="fas fa-heart" style="font-size:48px;color:#FFCCEC;display:block;margin-bottom:16px;"></i>
+                        <h5>Belum ada favorit</h5>
+                        <p class="text-muted">Mulai favoritkan produk yang Anda suka</p>
+                        <button class="btn-jelajahi" onclick="window.location.href='{% url "toko:kategori" %}'">Jelajahi Produk</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // ===== CARI PRODUK FAVORIT =====
+            const favoriteProducts = [];
+            
+            favorites.forEach(favId => {
+                // Coba cari berdasarkan ID (sebagai string)
+                let found = allProducts.find(p => String(p.id) === String(favId));
+                
+                // Jika tidak ditemukan, coba berdasarkan nama (untuk kompatibilitas)
+                if (!found) {
+                    found = allProducts.find(p => {
+                        const name = (p.name || '').toLowerCase();
+                        return name === String(favId).toLowerCase() || name.includes(String(favId).toLowerCase());
+                    });
+                }
+                
+                // Jika masih tidak ditemukan, coba berdasarkan product_type
+                if (!found) {
+                    found = allProducts.find(p => {
+                        const type = (p.product_type || '').toLowerCase();
+                        return type === String(favId).toLowerCase() || type.includes(String(favId).toLowerCase());
+                    });
+                }
+                
+                if (found) {
+                    favoriteProducts.push(found);
+                } else {
+                    console.warn('⚠️ Produk favorit tidak ditemukan di API:', favId);
+                }
+            });
+
+            console.log('✅ Produk favorit ditemukan:', favoriteProducts.length);
+
+            productGrid.innerHTML = '';
+            
+            if (favoriteProducts.length === 0) {
+                productGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <i class="fas fa-heart" style="font-size:48px;color:#FFCCEC;display:block;margin-bottom:16px;"></i>
+                        <h5>Produk favorit tidak ditemukan</h5>
+                        <p class="text-muted">Produk yang Anda favoritkan mungkin sudah tidak tersedia</p>
+                        <button class="btn-jelajahi" onclick="window.location.href='{% url "toko:kategori" %}'">Jelajahi Produk</button>
+                    </div>
+                `;
+                return;
+            }
+
+            favoriteProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                // ===== KONVERSI USD → IDR =====
+                const USD_TO_IDR = 16000;
+                let price = 'Rp -';
+                if (product.price) {
+                    const priceInRupiah = product.price * USD_TO_IDR;
+                    price = `Rp${Math.round(priceInRupiah).toLocaleString('id-ID')}`;
+                }
+                const productId = product.id || product.name;
+                
+                card.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.image_link || 'https://via.placeholder.com/200x200?text=No+Image'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/200x200?text=No+Image'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name || 'Produk'}</div>
+                        <div class="product-brand">${product.brand || 'Maybelline'}</div>
+                        <div class="product-price">${price}</div>
+                    </div>
+                    <button class="love-btn" data-product-id="${productId}" onclick="event.stopPropagation(); toggleFavorite('${productId}');">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                `;
+                
+                card.addEventListener('click', function() {
+                    const encodedId = encodeURIComponent(productId);
+                    window.location.href = `/produk/${encodedId}/`;
+                });
+                
+                productGrid.appendChild(card);
+            });
+        }
+
+        // ===== INIT =====
+        fetchProducts();
+
+        // Debug: Tampilkan isi localStorage di console
+        console.log('📋 Isi localStorage:');
+        console.log('  favorites:', localStorage.getItem('favorites'));
+        console.log('  cart:', localStorage.getItem('cart'));
+    </script>
+</body>
+</html>
