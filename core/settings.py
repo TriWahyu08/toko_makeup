@@ -13,7 +13,7 @@ SECRET_KEY = "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"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
