@@ -376,7 +376,7 @@ def home(request):
             return redirect('toko:admin_dashboard')
         else:
             # Arahkan ke halaman produk atau halaman user
-            return redirect('toko:produk')  # atau 'toko:lihat_semua'
+            return redirect('toko:home.html')
     else:
         # Jika belum login, tampilkan halaman login
         return render(request, 'toko/login.html')
