@@ -13,10 +13,10 @@ import uuid
 import json
 import os
 import requests
-import google.generativeai as genai
 import re
 from .models import Pesanan, PesananItem, Produk, Notification  
 from decimal import Decimal
+from google import genai
 
 #==============
 # fungsi admin
