@@ -372,7 +372,10 @@ def update_user_role(request):
 #============
 @login_required
 def home(request):
-    return render(request, 'toko/home.html')
+    if request.user.is_authenticated:
+        return render(request, 'toko/home.html')
+    else:
+        return redirect('toko:login')
 
 def login_view(request):
     if request.method == 'POST':
