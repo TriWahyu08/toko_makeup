@@ -1123,9 +1123,14 @@ def ai_chat_api(request):
         # ===== COBA GEMINI =====
         try:
             import google.generativeai as genai
+            from django.conf import settings
             
+            # Konfigurasi API Key
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            
+            # ✅ PERBAIKAN: Ganti model ke yang tersedia
+            # Model yang tersedia: gemini-2.0-flash, gemini-2.0-flash-lite, gemini-1.5-pro
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             system_prompt = """
             Anda adalah asisten kecantikan untuk toko makeup "MyBelin" yang menjual produk Maybelline.
@@ -1139,9 +1144,12 @@ def ai_chat_api(request):
             6. Akhiri dengan pertanyaan balik yang ramah
             """
             
+            # Generate response
             response = model.generate_content(f"{system_prompt}\n\nPertanyaan user: {message}")
             reply = response.text
             reply = format_ai_response(reply)
+            
+            print(f"✅ Gemini berhasil merespon")
             
         except Exception as e:
             print(f"⚠️ Gemini Error: {e}, pakai mock response")
