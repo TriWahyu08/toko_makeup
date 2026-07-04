@@ -154,7 +154,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / 'static']
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # ===== XENDIT CONFIGURATION =====
 XENDIT_SECRET_KEY = 'xnd_development_sXIbLJdDYkN8Gi9L9a3NIFCcZjAsQisTg78k9bl6G2KPGDbwP3gPTbeQ33wkg'
