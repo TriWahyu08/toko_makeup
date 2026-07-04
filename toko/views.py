@@ -1128,9 +1128,9 @@ def ai_chat_api(request):
             # Konfigurasi API Key
             genai.configure(api_key=settings.GEMINI_API_KEY)
             
-            # ✅ PERBAIKAN: Ganti model ke yang tersedia
+            
             # Model yang tersedia: gemini-2.0-flash, gemini-2.0-flash-lite, gemini-1.5-pro
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-1.5-pro')
             
             system_prompt = """
             Anda adalah asisten kecantikan untuk toko makeup "MyBelin" yang menjual produk Maybelline.
