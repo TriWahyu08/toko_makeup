@@ -372,14 +372,10 @@ def update_user_role(request):
 #============
 def home(request):
     if request.user.is_authenticated:
-        if request.user.is_staff or request.user.is_superuser:
-            return redirect('toko:admin_dashboard')
+            return render(request, 'toko/home.html')
         else:
-            # Arahkan ke halaman produk atau halaman user
-            return redirect('toko:home.html')
-    else:
-        # Jika belum login, tampilkan halaman login
-        return render(request, 'toko/login.html')
+            # Jika belum login, tampilkan halaman login
+            return render(request, 'toko/login.html')
 
 def login_view(request):
     if request.method == 'POST':
