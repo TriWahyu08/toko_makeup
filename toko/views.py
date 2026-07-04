@@ -372,10 +372,10 @@ def update_user_role(request):
 #============
 def home(request):
     if request.user.is_authenticated:
-            return render(request, 'toko/home.html')
-        else:
-            # Jika belum login, tampilkan halaman login
-            return render(request, 'toko/login.html')
+        return render(request, 'toko/home.html')
+    else:
+        # Jika belum login, tampilkan halaman login
+        return render(request, 'toko/login.html')
 
 def login_view(request):
     if request.method == 'POST':
