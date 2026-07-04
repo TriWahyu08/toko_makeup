@@ -1120,17 +1120,14 @@ def ai_chat_api(request):
         
         print(f"📝 Pesan diterima: {message}")
         
-        # ===== COBA GEMINI =====
+        # ===== COBA GEMINI DENGAN LIBRARY BARU =====
         try:
-            import google.generativeai as genai
+            # ✅ Gunakan library google.genai (yang baru)
+            from google import genai
             from django.conf import settings
             
-            # Konfigurasi API Key
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            
-            
-            # Model yang tersedia: gemini-2.0-flash, gemini-2.0-flash-lite, gemini-1.5-pro
-            model = genai.GenerativeModel('gemini-1.5-pro')
+            # Inisialisasi client
+            client = genai.Client(api_key=settings.GEMINI_API_KEY)
             
             system_prompt = """
             Anda adalah asisten kecantikan untuk toko makeup "MyBelin" yang menjual produk Maybelline.
@@ -1144,13 +1141,66 @@ def ai_chat_api(request):
             6. Akhiri dengan pertanyaan balik yang ramah
             """
             
-            # Generate response
-            response = model.generate_content(f"{system_prompt}\n\nPertanyaan user: {message}")
+            # Generate content dengan model terbaru
+            response = client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=f"{system_prompt}\n\nPertanyaan user: {message}"
+            )
+            
             reply = response.text
             reply = format_ai_response(reply)
             
-            print(f"✅ Gemini berhasil merespon")
+            print(f"✅ Gemini berhasil merespon dengan library google.genai")
             
+        except ImportError:
+            # ❌ Jika google.genai tidak tersedia, fallback ke google.generativeai
+            print("⚠️ google.genai tidak tersedia, fallback ke google.generativeai")
+            try:
+                import google.generativeai as genai
+                from django.conf import settings
+                
+                genai.configure(api_key=settings.GEMINI_API_KEY)
+                
+                # Coba beberapa model
+                models_to_try = [
+                    'gemini-1.5-pro',
+                    'gemini-pro',
+                    'gemini-1.5-flash',
+                ]
+                
+                model = None
+                for model_name in models_to_try:
+                    try:
+                        model = genai.GenerativeModel(model_name)
+                        break
+                    except:
+                        continue
+                
+                if not model:
+                    model = genai.GenerativeModel()
+                
+                system_prompt = """
+                Anda adalah asisten kecantikan untuk toko makeup "MyBelin" yang menjual produk Maybelline.
+                
+                ATURAN JAWAB:
+                1. Gunakan bahasa Indonesia yang ramah dan profesional
+                2. Jawab dengan ringkas, maksimal 3-4 paragraf
+                3. Gunakan bullet points (•) untuk daftar produk
+                4. Jangan gunakan markdown (**), (###), atau (---)
+                5. Sertakan estimasi harga produk
+                6. Akhiri dengan pertanyaan balik yang ramah
+                """
+                
+                response = model.generate_content(f"{system_prompt}\n\nPertanyaan user: {message}")
+                reply = response.text
+                reply = format_ai_response(reply)
+                
+                print(f"✅ Gemini berhasil merespon dengan google.generativeai")
+                
+            except Exception as e:
+                print(f"⚠️ Gemini Error (fallback): {e}, pakai mock response")
+                reply = get_mock_response(message)
+                
         except Exception as e:
             print(f"⚠️ Gemini Error: {e}, pakai mock response")
             reply = get_mock_response(message)
