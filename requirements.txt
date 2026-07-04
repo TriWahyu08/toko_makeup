@@ -1,7 +1,7 @@
 Django==6.0.6
 django-humanize
 requests
-google-generativeai
+google-generativeai==0.8.3
 pillow
 python-decouple
 django-allauth
