@@ -16,7 +16,7 @@ import requests
 import re
 from .models import Pesanan, PesananItem, Produk, Notification  
 from decimal import Decimal
-from google import genai
+import google.generativeai as genai
 
 #==============
 # fungsi admin
@@ -1118,11 +1118,13 @@ def ai_chat_api(request):
         
         # ===== COBA GEMINI =====
         try:
-            from google import genai
-            client = genai.Client(api_key=settings.GEMINI_API_KEY)
+            import google.generativeai as genai
+            
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
             system_prompt = """
-            Anda adalah asisten kecantikan untuk toko makeup "MayBelline" yang menjual produk Maybelline.
+            Anda adalah asisten kecantikan untuk toko makeup "MyBelin" yang menjual produk Maybelline.
             
             ATURAN JAWAB:
             1. Gunakan bahasa Indonesia yang ramah dan profesional
@@ -1133,13 +1135,9 @@ def ai_chat_api(request):
             6. Akhiri dengan pertanyaan balik yang ramah
             """
             
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=f"{system_prompt}\n\nPertanyaan user: {message}"
-            )
-            
+            response = model.generate_content(f"{system_prompt}\n\nPertanyaan user: {message}")
             reply = response.text
-            reply = format_ai_response(reply)  # Format ulang
+            reply = format_ai_response(reply)
             
         except Exception as e:
             print(f"⚠️ Gemini Error: {e}, pakai mock response")
@@ -1150,7 +1148,7 @@ def ai_chat_api(request):
     except Exception as e:
         print(f"❌ Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
-    
+
 # ===== MOCK RESPONSE (Fallback jika Gemini error) =====
 def get_mock_response(message):
     message = message.lower()
