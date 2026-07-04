@@ -370,6 +370,7 @@ def update_user_role(request):
 #============
 # HOME 
 #============
+@login_required
 def home(request):
     return render(request, 'toko/home.html')
 
