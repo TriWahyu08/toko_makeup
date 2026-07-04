@@ -48,8 +48,8 @@ SITE_ID = 1
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': '1090162822149-jsu6tj4ki13kvv18qqplmivjpce7ccdv.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': '680987002901-ie181v75km9oelrrf2u9dnsegcpljatk.apps.googleusercontent.com',
+            'secret': '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',
             'key': ''
         },
         'SCOPE': [
@@ -72,6 +72,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 
 MIDDLEWARE = [
